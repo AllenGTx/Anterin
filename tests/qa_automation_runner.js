@@ -55,7 +55,9 @@ const requiredAssets = [
     'asset/innova-reborn.jpg',
     'asset/allianz.svg.webp',
     'asset/default-rental-office.jpg',
-    'asset/Sopir1.jpg'
+    'asset/Sopir1.jpg',
+    'asset/qris-nasional.jpg',
+    'qris-nasional.jpg'
 ];
 requiredAssets.forEach(assetPath => {
     const fullP = path.resolve(__dirname, '..', assetPath);

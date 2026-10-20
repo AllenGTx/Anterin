@@ -4536,7 +4536,7 @@
                         <h3 style="font-family:'Urbanist',sans-serif; font-size:18px; font-weight:800; color:var(--navy); margin-bottom:4px;">Scan QRIS untuk Membayar</h3>
                         <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">Bisa discan dari semua Bank (BCA, Mandiri, BRI, dll) &amp; e-Wallet</p>
                         <div class="qris-img-wrap">
-                            <img src="qris-nasional.jpg?v=3" alt="QRIS Standar Pembayaran Nasional Allen Service">
+                            <img id="qrisNationalImg" src="asset/qris-nasional.jpg?v=5" onerror="if(this.src.indexOf('asset/')!==-1){this.src='qris-nasional.jpg';}" alt="QRIS Standar Pembayaran Nasional Allen Service">
                             <!-- Expired overlay -->
                             <div id="qrisExpiredOverlay" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); border-radius:16px; flex-direction:column; align-items:center; justify-content:center; gap:12px; z-index:10; backdrop-filter:blur(2px);">
                                 <div style="font-family:'Urbanist',sans-serif; font-weight:800; color:#ef4444; font-size:16px; text-align:center;"><i class="fa-solid fa-clock-rotate-left"></i> QRIS Kedaluwarsa</div>
@@ -5316,7 +5316,11 @@
                 }
                 currentListing._pickup = pickup;
             } else {
-                // Lepas kunci: lokasi penjemputan tidak perlu diisi, otomatis arahkan ke kantor rental
+                // Lepas kunci: validasi dokumen KTP & SIM A
+                if (!currentUser || !currentUser.hasSIM || !currentUser.hasKTP) {
+                    showSIMRequiredAlert();
+                    return;
+                }
                 const p = (typeof DEFAULT_PARTNER_PROFILES !== 'undefined' && DEFAULT_PARTNER_PROFILES[currentListing.partnerName]) ? DEFAULT_PARTNER_PROFILES[currentListing.partnerName] : null;
                 const officeAddr = p ? p.address : 'Jl. Pemuda No. 88, Pandansari, Semarang Tengah';
                 currentListing._pickup = `Ambil di Kantor Rental Resmi: ${currentListing.partnerName} (${officeAddr})`;
@@ -8945,6 +8949,14 @@
                     wEl.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
                 }
                 return;
+            }
+
+            if (isSelfDrive) {
+                // Validasi KTP & SIM A untuk sewa Lepas Kunci
+                if (!currentUser || !currentUser.hasSIM || !currentUser.hasKTP) {
+                    showSIMRequiredAlert();
+                    return;
+                }
             }
 
             if (!isSelfDrive) {
