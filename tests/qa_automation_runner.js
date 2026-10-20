@@ -284,6 +284,12 @@ window.onWidgetCarSearch = typeof onWidgetCarSearch !== 'undefined' ? onWidgetCa
 window.onWidgetCarSelectChange = typeof onWidgetCarSelectChange !== 'undefined' ? onWidgetCarSelectChange : null;
 window.updateCombinedBookingPickup = typeof updateCombinedBookingPickup !== 'undefined' ? updateCombinedBookingPickup : null;
 window.updateCombinedDetailPickup = typeof updateCombinedDetailPickup !== 'undefined' ? updateCombinedDetailPickup : null;
+window.openCarImageModal = typeof openCarImageModal !== 'undefined' ? openCarImageModal : null;
+window.closeCarImageModal = typeof closeCarImageModal !== 'undefined' ? closeCarImageModal : null;
+window.toggleModalActualSize = typeof toggleModalActualSize !== 'undefined' ? toggleModalActualSize : null;
+window.zoomImageModal = typeof zoomImageModal !== 'undefined' ? zoomImageModal : null;
+window.handleDetailMainImageClick = typeof handleDetailMainImageClick !== 'undefined' ? handleDetailMainImageClick : null;
+window.selectDetailThumbnail = typeof selectDetailThumbnail !== 'undefined' ? selectDetailThumbnail : null;
 Object.defineProperty(window, 'browseFilter', { get: () => typeof browseFilter !== 'undefined' ? browseFilter : {}, set: (v) => { browseFilter = v; } });
 Object.defineProperty(window, 'driversPool', { get: () => typeof driversPool !== 'undefined' ? driversPool : [], set: (v) => { driversPool = v; } });
 Object.defineProperty(window, 'driversInterval', { get: () => typeof driversInterval !== 'undefined' ? driversInterval : null });
@@ -927,6 +933,34 @@ mockDocument.getElementById('bookPickupBenchmark').value = 'Samping Indomaret Im
 const combinedVal = mockWindow.updateCombinedBookingPickup();
 assert(combinedVal.includes('Jl. Muara Mas X') && combinedVal.includes('Samping Indomaret Imam Bonjol'), 'Dual Address Logic: Combines full address and benchmark seamlessly');
 assert(mockDocument.getElementById('bookLokasi').value === combinedVal, 'Dual Address Logic: Hidden bookLokasi field synchronized');
+
+// =========================================================================
+// TEST SUITE 13: CAR IMAGE LIGHTBOX & ORIGINAL RESOLUTION MODAL
+// =========================================================================
+console.log('\n---------------------------------------------------------------');
+console.log('TEST SUITE 13: Car Image Lightbox & Original Resolution Modal');
+console.log('---------------------------------------------------------------');
+
+assert(rawHtml.includes('id="carImageModal"'), 'Car Image Lightbox: Modal #carImageModal present in HTML');
+assert(rawHtml.includes('id="imageModalImg"'), 'Car Image Lightbox: Image #imageModalImg present');
+assert(rawHtml.includes('id="imageModalTitle"'), 'Car Image Lightbox: Title #imageModalTitle present');
+assert(rawHtml.includes('id="imageModalDims"'), 'Car Image Lightbox: Dimensions badge #imageModalDims present');
+assert(rawHtml.includes('id="btnToggleActualSize"'), 'Car Image Lightbox: Toggle actual size button #btnToggleActualSize present');
+assert(rawHtml.includes('class="gallery-zoom-badge"'), 'Car Gallery: Hover zoom badge present in DOM/CSS');
+assert(rawHtml.includes('class="gallery-popup-trigger-btn"'), 'Car Gallery: Explicit popup expand button present in DOM/CSS');
+assert(typeof mockWindow.openCarImageModal === 'function', 'Car Image Lightbox: openCarImageModal function exists');
+assert(typeof mockWindow.closeCarImageModal === 'function', 'Car Image Lightbox: closeCarImageModal function exists');
+assert(typeof mockWindow.toggleModalActualSize === 'function', 'Car Image Lightbox: toggleModalActualSize function exists');
+assert(typeof mockWindow.zoomImageModal === 'function', 'Car Image Lightbox: zoomImageModal function exists');
+assert(typeof mockWindow.handleDetailMainImageClick === 'function', 'Car Image Lightbox: handleDetailMainImageClick function exists');
+assert(typeof mockWindow.selectDetailThumbnail === 'function', 'Car Image Lightbox: selectDetailThumbnail function exists');
+
+// Interactive modal test
+mockWindow.openCarImageModal(['asset/innova-reborn.jpg'], 0, 'Toyota Innova Reborn');
+assert(mockDocument.getElementById('carImageModal').classList.contains('active'), 'Interactive Lightbox: Modal opened with active class');
+assert(mockDocument.getElementById('imageModalTitle').textContent === 'Toyota Innova Reborn', 'Interactive Lightbox: Displays correct car title');
+mockWindow.closeCarImageModal();
+assert(!mockDocument.getElementById('carImageModal').classList.contains('active'), 'Interactive Lightbox: Modal successfully closed');
 
 // =========================================================================
 // SUMMARY
