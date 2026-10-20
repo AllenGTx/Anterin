@@ -8994,9 +8994,10 @@
                 alert('Silakan centang persetujuan Syarat & Ketentuan terlebih dahulu.');
                 return;
             }
+            const actionToRun = pendingBookingAction;
             closeTnCModal();
-            if (typeof pendingBookingAction === 'function') {
-                pendingBookingAction();
+            if (typeof actionToRun === 'function') {
+                actionToRun();
             }
         }
 

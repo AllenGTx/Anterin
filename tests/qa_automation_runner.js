@@ -300,6 +300,7 @@ Object.defineProperty(window, 'currentBooking', { get: () => currentBooking, set
 Object.defineProperty(window, 'bookingHistory', { get: () => bookingHistory, set: (v) => { bookingHistory = v; } });
 Object.defineProperty(window, 'currentUser', { get: () => currentUser, set: (v) => { currentUser = v; } });
 Object.defineProperty(window, 'isLoggedIn', { get: () => isLoggedIn, set: (v) => { isLoggedIn = v; } });
+Object.defineProperty(window, 'pendingBookingAction', { get: () => pendingBookingAction, set: (v) => { pendingBookingAction = v; } });
 `;
 appScript += '\n' + exportCode;
 
@@ -796,6 +797,11 @@ assert(!tncBtn.classList.contains('enabled'), 'T&C Interactive PASS: Confirm but
 tncChk.checked = true;
 mockWindow.onTnCCheckboxChange();
 assert(tncBtn.classList.contains('enabled'), 'T&C Interactive PASS: Confirm button enabled when renter checks agreement checkbox');
+
+let actionCalled = false;
+mockWindow.pendingBookingAction = () => { actionCalled = true; };
+mockWindow.confirmTnCAndProceed();
+assert(actionCalled === true, 'T&C Interactive PASS: confirmTnCAndProceed successfully invokes pending booking action');
 
 // 7. Booking Receipt & WhatsApp Message Differentiation
 // Case A: Lepas Kunci receipt shows rental office address
