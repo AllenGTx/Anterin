@@ -1,0 +1,12 @@
+# Exclude massive local files (> 100MB)
+UX presentasi.mp4
+Demo Only.mp4
+Milestone UX 2 - Fix.rtf
+Final Milestone and Final Report UX.docx
+Poster UX.pdf
+asset/videobackgroundcar.webm
+
+# Logs and deps
+node_modules/
+*.log
+.vercel
