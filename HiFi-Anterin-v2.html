@@ -1896,6 +1896,7 @@
         <span id="why-choose-us-anchor" style="position:relative; top:-80px; display:block; visibility:hidden;"></span>
         <section class="why-choose-us-video">
             <video autoplay muted loop playsinline class="why-choose-video" preload="auto">
+                <source src="asset/videobackgroundcar.webm" type="video/webm">
                 <source src="asset/Background.mp4" type="video/mp4">
                 <source src="Background.mp4" type="video/mp4">
                 Browser Anda tidak mendukung video HTML5.
@@ -3185,6 +3186,7 @@
         <!-- HERO BANNER DENGAN VIDEO BACKGROUND (MEGA LUXURY BANNER) -->
         <div style="position:relative; min-height:85vh; padding:160px 40px 140px; text-align:center; color:white; overflow:hidden; display:flex; align-items:center; justify-content:center;">
             <video autoplay muted loop playsinline class="why-choose-video" preload="auto">
+                <source src="asset/videobackgroundcar.webm" type="video/webm">
                 <source src="asset/Background.mp4" type="video/mp4">
                 <source src="Background.mp4" type="video/mp4">
                 Browser Anda tidak mendukung video HTML5.
@@ -4417,20 +4419,58 @@
 
         // Default dummy listings from Rental Mas Amba Semarang
         const DUMMY_LISTINGS = [
-            { id:'dl-1', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Innova Reborn', carType:'MPV', year:2022, capacity:7, pricePerDay:500000, description:'MPV andalan untuk perjalanan keluarga dan bisnis di Semarang. Kabin luas, AC dingin, dan kenyamanan premium.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','Bisa Luar Kota'], photos:['asset/innova-reborn.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:true, hasDriver:true },
-            { id:'dl-2', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Innova Zenix', carType:'MPV', year:2023, capacity:7, pricePerDay:650000, description:'Innova terbaru dengan teknologi hybrid. Lebih irit BBM dan kabin modern berkelas.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','WiFi In-Car'], photos:['https://assets.promediateknologi.id/crop/0x0:0x0/1200x0/webp/photo/p3/83/2024/05/10/Kijang-Innova-Zenix-moving-146697323.jpeg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:true, hasDriver:true },
-            { id:'dl-3', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Fortuner GR Sport', carType:'SUV', year:2023, capacity:7, pricePerDay:900000, description:'SUV premium tangguh dengan tampilan sporty. Cocok untuk perjalanan off-road maupun city tour.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','Asuransi Perjalanan'], photos:['https://d1g6w7sntckt92.cloudfront.net/public/images/car_gallery_images/dQkKzAh1bVv9NZzmkm6b2sER5dFjPUB2awZNc4a2.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:true, hasDriver:true },
-            { id:'dl-4', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Alphard VIP', carType:'Luxury', year:2023, capacity:6, pricePerDay:1800000, description:'Kemewahan sejati untuk perjalanan VVIP. Kursi captain seat, hiburan premium, dan keheningan kabin terbaik.', features:['AC Double Blower','Supir VVIP','BBM Termasuk','Snack & Minuman','WiFi In-Car','Asuransi Perjalanan'], photos:['https://www.balisatak.com/img/alphard/01.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
-            { id:'dl-5', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Hiace Premio', carType:'Minibus', year:2022, capacity:14, pricePerDay:1200000, description:'Minibus premium berkapasitas besar untuk rombongan. Cocok untuk city tour, pernikahan, atau company trip.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','Bisa Luar Kota'], photos:['asset/Hiace-Premio.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
-            { id:'dl-6', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Mercedes-Benz S-Class', carType:'Sedan', year:2023, capacity:4, pricePerDay:2200000, description:'Sedan flagship kemewahan tertinggi dengan suspensi udara Airmatic, jok pijat Nappa, dan ketenangan absolut.', features:['Air Suspension','Supir VVIP','BBM Termasuk','Massage Seats','Burmester Audio'], photos:['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPN1LQwxSSxQQNEUNJZOLQYU5aD2qq-tKerg&s'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
-            { id:'dl-7', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'BMW X7 xDrive', carType:'SUV', year:2024, capacity:6, pricePerDay:2500000, description:'The President of SUVs. Performa TwinPower Turbo bertenaga buas dipadu kemewahan 3 baris dan atap Panoramic Sky Lounge.', features:['Panoramic Sky Lounge','Supir VVIP','BBM Termasuk','xDrive AWD','Harman Kardon Audio'], photos:['https://hips.hearstapps.com/hmg-prod/images/2023-bmw-x7-xdrive-40i134-641c5b3ca7165.jpg?crop=0.699xw:0.589xh;0.239xw,0.310xh&resize=2048:*'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
-            { id:'dl-8', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Range Rover Vogue', carType:'SUV', year:2023, capacity:4, pricePerDay:2800000, description:'Bangsawan Inggris sejati. SUV ultra-mewah dengan kemampuan all-terrain legendaris dan Active Noise Cancellation di sandaran kepala.', features:['Active Noise Cancellation','Supir VVIP','BBM Termasuk','Terrain Response 2','Meridian 3D Sound'], photos:['https://imgcdn.oto.com/large/gallery/exterior/43/1983/land-rover-range-rover-front-angle-low-view-576079.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
-            { id:'dl-9', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Lexus LM 350', carType:'Luxury', year:2024, capacity:4, pricePerDay:3000000, description:'Puncak kemewahan armada Anterin. Lexus LM untuk tamu VVIP, eksekutif, dan momen paling spesial.', features:['AC Double Blower','Supir VVIP','BBM Termasuk','Snack & Minuman','WiFi In-Car','Asuransi Perjalanan','Kursi Bayi Tersedia'], photos:['https://imgcdn.oto.com/large/gallery/exterior/22/2813/lexus-lm-front-angle-low-view-489785.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
-            { id:'dl-10', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Audi A8 L', carType:'Sedan', year:2023, capacity:4, pricePerDay:2400000, description:'Sedan limusin eksekutif dengan penggerak legendaris Quattro AWD, kabin Long Wheelbase super lega, dan suspensi aktif prediktif.', features:['Quattro AWD','Supir VVIP','BBM Termasuk','Long Wheelbase','Bang & Olufsen 3D Sound'], photos:['https://upload.wikimedia.org/wikipedia/commons/3/31/2018_Audi_A8_50_TDi_Quattro_Automatic_3.0.jpg'], rating:5.0, totalReviews:1, isAvailable:true, canSelfDrive:false, hasDriver:true }
+            { id:'dl-1', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Innova Reborn', carType:'MPV', year:2022, capacity:7, pricePerDay:500000, description:'MPV andalan untuk perjalanan keluarga dan bisnis di Semarang. Kabin luas, AC dingin, dan kenyamanan premium.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','Bisa Luar Kota'], photos:['asset/innova-reborn.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:true, hasDriver:true },
+            { id:'dl-2', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Innova Zenix', carType:'MPV', year:2023, capacity:7, pricePerDay:650000, description:'Innova terbaru dengan teknologi hybrid. Lebih irit BBM dan kabin modern berkelas.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','WiFi In-Car'], photos:['https://assets.promediateknologi.id/crop/0x0:0x0/1200x0/webp/photo/p3/83/2024/05/10/Kijang-Innova-Zenix-moving-146697323.jpeg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:true, hasDriver:true },
+            { id:'dl-3', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Fortuner GR Sport', carType:'SUV', year:2023, capacity:7, pricePerDay:900000, description:'SUV premium tangguh dengan tampilan sporty. Cocok untuk perjalanan off-road maupun city tour.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','Asuransi Perjalanan'], photos:['https://d1g6w7sntckt92.cloudfront.net/public/images/car_gallery_images/dQkKzAh1bVv9NZzmkm6b2sER5dFjPUB2awZNc4a2.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:true, hasDriver:true },
+            { id:'dl-4', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Alphard VIP', carType:'Luxury', year:2023, capacity:6, pricePerDay:1800000, description:'Kemewahan sejati untuk perjalanan VVIP. Kursi captain seat, hiburan premium, dan keheningan kabin terbaik.', features:['AC Double Blower','Supir VVIP','BBM Termasuk','Snack & Minuman','WiFi In-Car','Asuransi Perjalanan'], photos:['https://www.balisatak.com/img/alphard/01.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
+            { id:'dl-5', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Toyota Hiace Premio', carType:'Minibus', year:2022, capacity:14, pricePerDay:1200000, description:'Minibus premium berkapasitas besar untuk rombongan. Cocok untuk city tour, pernikahan, atau company trip.', features:['AC Double Blower','Supir Berpengalaman','BBM Termasuk','Bisa Luar Kota'], photos:['asset/Hiace-Premio.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
+            { id:'dl-6', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Mercedes-Benz S-Class', carType:'Sedan', year:2023, capacity:4, pricePerDay:2200000, description:'Sedan flagship kemewahan tertinggi dengan suspensi udara Airmatic, jok pijat Nappa, dan ketenangan absolut.', features:['Air Suspension','Supir VVIP','BBM Termasuk','Massage Seats','Burmester Audio'], photos:['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPN1LQwxSSxQQNEUNJZOLQYU5aD2qq-tKerg&s'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
+            { id:'dl-7', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'BMW X7 xDrive', carType:'SUV', year:2024, capacity:6, pricePerDay:2500000, description:'The President of SUVs. Performa TwinPower Turbo bertenaga buas dipadu kemewahan 3 baris dan atap Panoramic Sky Lounge.', features:['Panoramic Sky Lounge','Supir VVIP','BBM Termasuk','xDrive AWD','Harman Kardon Audio'], photos:['https://hips.hearstapps.com/hmg-prod/images/2023-bmw-x7-xdrive-40i134-641c5b3ca7165.jpg?crop=0.699xw:0.589xh;0.239xw,0.310xh&resize=2048:*'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
+            { id:'dl-8', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Range Rover Vogue', carType:'SUV', year:2023, capacity:4, pricePerDay:2800000, description:'Bangsawan Inggris sejati. SUV ultra-mewah dengan kemampuan all-terrain legendaris dan Active Noise Cancellation di sandaran kepala.', features:['Active Noise Cancellation','Supir VVIP','BBM Termasuk','Terrain Response 2','Meridian 3D Sound'], photos:['https://imgcdn.oto.com/large/gallery/exterior/43/1983/land-rover-range-rover-front-angle-low-view-576079.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
+            { id:'dl-9', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Lexus LM 350', carType:'Luxury', year:2024, capacity:4, pricePerDay:3000000, description:'Puncak kemewahan armada Anterin. Lexus LM untuk tamu VVIP, eksekutif, dan momen paling spesial.', features:['AC Double Blower','Supir VVIP','BBM Termasuk','Snack & Minuman','WiFi In-Car','Asuransi Perjalanan','Kursi Bayi Tersedia'], photos:['https://imgcdn.oto.com/large/gallery/exterior/22/2813/lexus-lm-front-angle-low-view-489785.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true },
+            { id:'dl-10', partnerName:'Rental Mas Amba Semarang', partnerPhone:'08123456789', carName:'Audi A8 L', carType:'Sedan', year:2023, capacity:4, pricePerDay:2400000, description:'Sedan limusin eksekutif dengan penggerak legendaris Quattro AWD, kabin Long Wheelbase super lega, dan suspensi aktif prediktif.', features:['Quattro AWD','Supir VVIP','BBM Termasuk','Long Wheelbase','Bang & Olufsen 3D Sound'], photos:['https://upload.wikimedia.org/wikipedia/commons/3/31/2018_Audi_A8_50_TDi_Quattro_Automatic_3.0.jpg'], rating:5.0, totalReviews:1, total_ratingperunit:5.0, total_testimoninya:1, isAvailable:true, canSelfDrive:false, hasDriver:true }
         ];
 
+        // Helper render icon bintang rating (Full, Half, Empty)
+        function renderStarsHtml(rating, count) {
+            if (!count || count === 0) {
+                return `
+                    <span style="color:#cbd5e1; font-size:12px; display:inline-flex; gap:2px;">
+                        <i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i>
+                    </span>
+                    <span style="font-size:12px; color:#94a3b8; font-weight:600; margin-left:4px;">Belum ada ulasan</span>
+                `;
+            }
+            const num = Number(rating) || 0;
+            const fullStars = Math.floor(num);
+            const hasHalf = (num - fullStars) >= 0.3 && (num - fullStars) <= 0.7;
+            const extraFull = (num - fullStars) > 0.7 ? 1 : 0;
+            const emptyStars = Math.max(0, 5 - fullStars - extraFull - (hasHalf ? 1 : 0));
+
+            let stars = '<i class="fa-solid fa-star" style="color:var(--gold);"></i>'.repeat(fullStars + extraFull);
+            if (hasHalf) stars += '<i class="fa-solid fa-star-half-stroke" style="color:var(--gold);"></i>';
+            if (emptyStars > 0) stars += '<i class="fa-regular fa-star" style="color:#cbd5e1;"></i>'.repeat(emptyStars);
+
+            return `
+                <span style="font-size:12px; display:inline-flex; gap:2px;">${stars}</span>
+                <span style="font-size:12px; color:#64748b; font-weight:700; margin-left:4px;">${num.toFixed(1)} (${count} ulasan)</span>
+            `;
+        }
+
         function getCarReviewStats(listing) {
-            if (!listing) return { rating: '5.0', count: 0, label: '(0 ulasan)' };
+            if (!listing) {
+                return {
+                    rating: '0.0',
+                    ratingNum: 0,
+                    ratingDisplay: '0.0',
+                    count: 0,
+                    label: '(0 ulasan)',
+                    total_ratingperunit: 0,
+                    total_testimoninya: 0,
+                    starsHtml: renderStarsHtml(0, 0),
+                    hasReviews: false
+                };
+            }
             const targetId = (listing.id || '').toLowerCase().trim();
             const targetName = (listing.carName || '').toLowerCase().trim();
 
@@ -4442,12 +4482,37 @@
                 return false;
             });
 
-            if (reviews.length === 0) {
-                return { rating: '5.0', count: 0, label: '(0 ulasan)' };
+            const total = reviews.length;
+            if (total === 0) {
+                return {
+                    rating: '0.0',
+                    ratingNum: 0,
+                    ratingDisplay: '0.0',
+                    count: 0,
+                    label: '(0 ulasan)',
+                    total_ratingperunit: 0,
+                    total_testimoninya: 0,
+                    starsHtml: renderStarsHtml(0, 0),
+                    hasReviews: false
+                };
             }
             const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
-            const avg = (sum / reviews.length).toFixed(1);
-            return { rating: avg, count: reviews.length, label: `(${reviews.length} ulasan)` };
+            // Rumus rating: Total rating per unit dibagi total testimoni (1 desimal)
+            // Contoh user: orang 1 bintang 5, orang 2 bintang 4, orang 3 bintang 5 -> 14 / 3 = 4.6
+            const avg = Math.floor((sum / total) * 10) / 10;
+            const avgFormatted = avg.toFixed(1);
+
+            return {
+                rating: avgFormatted,
+                ratingNum: avg,
+                ratingDisplay: avgFormatted,
+                count: total,
+                label: `(${total} ulasan)`,
+                total_ratingperunit: avg,
+                total_testimoninya: total,
+                starsHtml: renderStarsHtml(avg, total),
+                hasReviews: true
+            };
         }
 
         function normalizeListingServices(l) {
@@ -4570,8 +4635,7 @@
                         <div class="car-card-price">Rp ${l.pricePerDay.toLocaleString('id')}<span>/hari</span></div>
                         <div class="car-card-footer">
                             <div class="car-card-stars">
-                                ${'<i class="fa-solid fa-star"></i>'.repeat(Math.floor(Number(stats.rating) || 5))}
-                                <span style="font-size:12px; color:#64748b; font-weight:600; margin-left:4px;">${stats.rating} ${stats.label}</span>
+                                ${stats.starsHtml}
                             </div>
                             <button class="car-card-btn" onclick="viewCarDetail('${l.id}')">Detail</button>
                         </div>
@@ -4592,7 +4656,7 @@
             document.getElementById('detailName').textContent   = listing.carName;
             document.getElementById('detailType').textContent   = `${listing.carType} · ${listing.year} · ${listing.capacity} Orang`;
             document.getElementById('detailDesc').textContent   = listing.description;
-            document.getElementById('detailRating').textContent = `${stats.rating} ${stats.label}`;
+            document.getElementById('detailRating').innerHTML = stats.count > 0 ? `${stats.ratingDisplay} (${stats.count} ulasan)` : '<span style="color:#94a3b8;">Belum ada ulasan</span>';
             document.getElementById('detailCap').textContent    = listing.capacity;
             document.getElementById('detailPrice').innerHTML    = `Rp ${listing.pricePerDay.toLocaleString('id')}<span>/hari</span>`;
 
@@ -5390,8 +5454,10 @@
                 description: desc,
                 features: feats,
                 photos: uploadedPhotos.length > 0 ? uploadedPhotos.slice(0,5) : ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'],
-                rating: 5.0,
-                totalReviews: 1,
+                rating: 0,
+                totalReviews: 0,
+                total_ratingperunit: 0,
+                total_testimoninya: 0,
                 isAvailable: true
             };
 
@@ -6323,8 +6389,8 @@
                 phone: phone,
                 tagline: 'Mitra Rental Terpercaya Resmi Anterin Semarang',
                 mapsUrl: gmaps || `https://maps.google.com/?q=${encodeURIComponent(fullAddress || 'Kota Semarang')}`,
-                rating: 5.0,
-                reviewsCount: 1
+                rating: 0,
+                reviewsCount: 0
             } : null;
 
             const btn = document.getElementById('signupSubmitBtn');
@@ -6604,8 +6670,8 @@
                         phone: user.phoneNumber || '08xxxxxxxxxx',
                         tagline: 'Mitra Rental Terpercaya Resmi Anterin Semarang',
                         mapsUrl: gmaps || `https://maps.google.com/?q=${encodeURIComponent(fullAddress || 'Kota Semarang')}`,
-                        rating: 5.0,
-                        reviewsCount: 1
+                        rating: 0,
+                        reviewsCount: 0
                     } : null;
 
                     // Save new user profile in Firestore
@@ -6908,8 +6974,8 @@
                 photo: 'asset/default-rental-office.jpg',
                 address: 'Jl. Pemuda No. 88, Pandansari, Semarang Tengah, Kota Semarang',
                 phone: '0812-3456-7890',
-                rating: 4.9,
-                reviewsCount: 148,
+                rating: 5.0,
+                reviewsCount: 10,
                 activeUnits: '10+ Unit Armada',
                 tagline: 'Penyedia Armada Eksekutif & Pengemudi Profesional Terpercaya Semarang',
                 mapsUrl: 'https://maps.google.com/?q=Semarang+Tengah'
@@ -6921,8 +6987,8 @@
                 photo: 'asset/default-rental-office.jpg',
                 address: 'Jl. Pandanaran No. 45, Mugassari, Semarang Selatan',
                 phone: '0813-9876-5432',
-                rating: 4.8,
-                reviewsCount: 86,
+                rating: 0,
+                reviewsCount: 0,
                 activeUnits: '6 Unit Armada',
                 tagline: 'Layanan Rental Cepat, Nyaman, dan Terpercaya di Kota Semarang',
                 mapsUrl: 'https://maps.google.com/?q=Semarang+Selatan'
@@ -6930,6 +6996,72 @@
         };
 
         let currentUploadedRentalPhoto = null;
+
+        // Menghitung statistik ulasan riil mitra berdasarkan database ulasan armada miliknya
+        function getPartnerReviewStats(partnerName) {
+            const cleanName = (partnerName || '').trim().toLowerCase();
+            if (!cleanName) {
+                return {
+                    rating: 0,
+                    ratingDisplay: '-',
+                    count: 0,
+                    label: '(0 Ulasan)',
+                    hasReviews: false,
+                    starsHtml: '<i class="fa-regular fa-star" style="color:#64748b;"></i>'.repeat(5)
+                };
+            }
+
+            const partnerCars = (typeof allListings !== 'undefined' ? allListings : []).filter(l => 
+                (l.partnerName || '').trim().toLowerCase() === cleanName
+            );
+            const carIds = partnerCars.map(c => (c.id || '').toLowerCase());
+            const carNames = partnerCars.map(c => (c.carName || '').toLowerCase());
+
+            const pool = (typeof testimonialsPool !== 'undefined' ? testimonialsPool : []);
+            const matchingReviews = pool.filter(t => {
+                const tPartner = (t.partnerName || '').trim().toLowerCase();
+                if (tPartner && tPartner === cleanName) return true;
+                const tCarId = (t.carId || '').toLowerCase();
+                const tCarName = (t.carName || '').toLowerCase();
+                if (tCarId && carIds.includes(tCarId)) return true;
+                if (tCarName && carNames.includes(tCarName)) return true;
+                return false;
+            });
+
+            const count = matchingReviews.length;
+            if (count === 0) {
+                return {
+                    rating: 0,
+                    ratingDisplay: '-',
+                    count: 0,
+                    label: '(0 Ulasan)',
+                    hasReviews: false,
+                    starsHtml: '<i class="fa-regular fa-star" style="color:#64748b;"></i>'.repeat(5)
+                };
+            }
+
+            const sum = matchingReviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
+            const avg = Math.floor((sum / count) * 10) / 10;
+
+            const num = Number(avg) || 0;
+            const fullStars = Math.floor(num);
+            const hasHalf = (num - fullStars) >= 0.3 && (num - fullStars) <= 0.7;
+            const extraFull = (num - fullStars) > 0.7 ? 1 : 0;
+            const emptyStars = Math.max(0, 5 - fullStars - extraFull - (hasHalf ? 1 : 0));
+
+            let stars = '<i class="fa-solid fa-star"></i>'.repeat(fullStars + extraFull);
+            if (hasHalf) stars += '<i class="fa-solid fa-star-half-stroke"></i>';
+            if (emptyStars > 0) stars += '<i class="fa-regular fa-star" style="color:#64748b;"></i>'.repeat(emptyStars);
+
+            return {
+                rating: avg,
+                ratingDisplay: avg.toFixed(1),
+                count: count,
+                label: `(${count} Ulasan Positif)`,
+                hasReviews: true,
+                starsHtml: stars
+            };
+        }
 
         function renderRentalTemplateCard(data, isPreview) {
             const photo = data.photo || 'asset/default-rental-office.jpg';
@@ -6941,9 +7073,14 @@
                 cleanPhone = '62' + cleanPhone.slice(1);
             }
             const tagline = data.tagline || 'Penyedia Armada Eksekutif & Pengemudi Profesional Terpercaya Semarang';
-            const rating = data.rating || 5.0;
-            const reviewsCount = data.reviewsCount || 1;
             const mapsUrl = data.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+
+            // DYNAMIC PARTNER RATING & REVIEWS: Dihitung secara riil dari database ulasan armada mitra
+            const partnerStats = getPartnerReviewStats(name);
+            const reviewsCount = partnerStats.count;
+            const ratingScoreDisplay = partnerStats.count > 0 ? partnerStats.ratingDisplay : '-';
+            const ratingCountDisplay = partnerStats.count > 0 ? `(${reviewsCount} Ulasan Positif)` : '(0 Ulasan)';
+            const ratingStarsHtml = partnerStats.starsHtml;
 
             // 1. DYNAMIC FLEET COUNT: Dihitung sesuai armada riil milik mitra
             const partnerCars = (typeof allListings !== 'undefined' ? allListings : []).filter(l => (l.partnerName || '').trim().toLowerCase() === name.trim().toLowerCase());
@@ -7055,10 +7192,10 @@
                         <h2 class="rental-card-business-name">${name}</h2>
                         <div class="rental-card-rating-wrap">
                             <div class="rental-card-stars">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                ${ratingStarsHtml}
                             </div>
-                            <span class="rental-rating-score">${rating}</span>
-                            <span class="rental-rating-count">(${reviewsCount} Ulasan Positif)</span>
+                            <span class="rental-rating-score" ${reviewsCount === 0 ? 'style="color:#cbd5e1; font-weight:700;"' : ''}>${ratingScoreDisplay}</span>
+                            <span class="rental-rating-count">${ratingCountDisplay}</span>
                         </div>
                     </div>
 
@@ -7139,8 +7276,8 @@
                     photo: currentUser.rentalCard?.photo || currentUploadedRentalPhoto || 'asset/default-rental-office.jpg',
                     address: currentUser.rentalCard?.address || currentUser.fullAddress || currentUser.address || 'Jl. Pemuda No. 88, Semarang',
                     phone: myPhone,
-                    rating: currentUser.rentalCard?.rating || 5.0,
-                    reviewsCount: currentUser.rentalCard?.reviewsCount || 1,
+                    rating: currentUser.rentalCard?.rating || 0,
+                    reviewsCount: currentUser.rentalCard?.reviewsCount || 0,
                     activeUnits: currentUser.rentalCard?.activeUnits,
                     tagline: currentUser.rentalCard?.tagline || 'Penyedia Armada Terpercaya & Pengemudi Profesional Semarang',
                     mapsUrl: currentUser.rentalCard?.mapsUrl || currentUser.gmaps || `https://maps.google.com/?q=${encodeURIComponent(currentUser.address || key + ' Semarang')}`
@@ -7175,8 +7312,8 @@
                     photo: partnerPhoto,
                     address: partnerAddr,
                     phone: partnerPhone,
-                    rating: savedCard?.rating || 5.0,
-                    reviewsCount: savedCard?.reviewsCount || 1,
+                    rating: savedCard?.rating || 0,
+                    reviewsCount: savedCard?.reviewsCount || 0,
                     tagline: savedCard?.tagline || 'Mitra Rental Terpercaya Resmi Anterin Semarang',
                     mapsUrl: savedCard?.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(partnerAddr)}`
                 };
@@ -9461,6 +9598,31 @@
                 }).catch(err => console.warn('Firestore testimonial save error:', err.message));
             }
 
+            // Sinkronisasi data unit: total_ratingperunit dan total_testimoninya
+            const targetCar = (typeof allListings !== 'undefined' ? allListings : []).find(l => 
+                (l.id && l.id === carId) || 
+                (l.carName && l.carName.toLowerCase() === carName.toLowerCase())
+            );
+            if (targetCar) {
+                const s = getCarReviewStats(targetCar);
+                targetCar.total_ratingperunit = s.total_ratingperunit;
+                targetCar.total_testimoninya = s.total_testimoninya;
+                targetCar.rating = Number(s.rating);
+                targetCar.totalReviews = s.count;
+
+                try {
+                    let custom = JSON.parse(localStorage.getItem('anterin_custom_listings') || '[]');
+                    const cIdx = custom.findIndex(c => c.id === targetCar.id || (c.carName || '').toLowerCase() === (targetCar.carName || '').toLowerCase());
+                    if (cIdx !== -1) {
+                        custom[cIdx].total_ratingperunit = s.total_ratingperunit;
+                        custom[cIdx].total_testimoninya = s.total_testimoninya;
+                        custom[cIdx].rating = Number(s.rating);
+                        custom[cIdx].totalReviews = s.count;
+                        localStorage.setItem('anterin_custom_listings', JSON.stringify(custom));
+                    }
+                } catch(e) {}
+            }
+
             renderTestimonials();
             if (typeof currentListing !== 'undefined' && currentListing) {
                 renderDetailReviews(currentListing);
@@ -9635,6 +9797,15 @@
 
         let testimonialsPool = [...DEFAULT_TESTIMONIALS];
 
+        // Setelah testimonialsPool diinisialisasi, sinkronisasi rating tiap unit dari ulasan riil
+        allListings.forEach(l => {
+            const stats = getCarReviewStats(l);
+            l.total_ratingperunit = stats.total_ratingperunit;
+            l.total_testimoninya = stats.total_testimoninya;
+            l.rating = Number(stats.rating);
+            l.totalReviews = stats.count;
+        });
+
         function renderTestimonials() {
             const track = document.getElementById('testiSliderTrack');
             if (!track) return;
@@ -9709,10 +9880,9 @@
                 return false;
             });
 
-            const total = matches.length;
-            const avg = total > 0 
-                ? (matches.reduce((sum, r) => sum + (Number(r.rating) || 5), 0) / total).toFixed(1)
-                : '5.0';
+            const stats = getCarReviewStats(listing);
+            const total = stats.count;
+            const avg = stats.count > 0 ? stats.ratingDisplay : '0.0';
 
             if (avgEl) avgEl.textContent = avg;
             if (countEl) countEl.textContent = `(${total} ulasan)`;
@@ -9720,7 +9890,20 @@
             // Update car rating on detail page
             const detailRating = document.getElementById('detailRating');
             if (detailRating) {
-                detailRating.textContent = total > 0 ? `${avg} (${total} ulasan)` : `5.0 (0 ulasan)`;
+                detailRating.innerHTML = total > 0 ? `${avg} (${total} ulasan)` : '<span style="color:#94a3b8;">Belum ada ulasan</span>';
+            }
+
+            const summaryBadge = document.getElementById('detailReviewsSummaryBadge');
+            if (summaryBadge) {
+                if (total === 0) {
+                    summaryBadge.style.background = '#f8fafc';
+                    summaryBadge.style.borderColor = '#e2e8f0';
+                    summaryBadge.innerHTML = `<i class="fa-regular fa-star" style="color:#cbd5e1;"></i> <span id="detailReviewsAvg" style="font-weight:700; color:#94a3b8; font-size:13px;">0.0</span> <span id="detailReviewsCount" style="color:#94a3b8; font-size:12px;">(0 ulasan)</span>`;
+                } else {
+                    summaryBadge.style.background = '#fefce8';
+                    summaryBadge.style.borderColor = '#fde047';
+                    summaryBadge.innerHTML = `<i class="fa-solid fa-star" style="color:var(--gold);"></i> <span id="detailReviewsAvg" style="font-weight:800; color:var(--navy); font-size:14px;">${avg}</span> <span id="detailReviewsCount" style="color:#64748b; font-size:12px;">(${total} ulasan)</span>`;
+                }
             }
 
             if (total === 0) {
