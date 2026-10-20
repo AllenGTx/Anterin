@@ -286,6 +286,8 @@ window.onWidgetCarSearch = typeof onWidgetCarSearch !== 'undefined' ? onWidgetCa
 window.onWidgetCarSelectChange = typeof onWidgetCarSelectChange !== 'undefined' ? onWidgetCarSelectChange : null;
 window.updateCombinedBookingPickup = typeof updateCombinedBookingPickup !== 'undefined' ? updateCombinedBookingPickup : null;
 window.updateCombinedDetailPickup = typeof updateCombinedDetailPickup !== 'undefined' ? updateCombinedDetailPickup : null;
+window.mergeTestimonialsWithDefaults = typeof mergeTestimonialsWithDefaults !== 'undefined' ? mergeTestimonialsWithDefaults : null;
+window.syncAllListingReviewStats = typeof syncAllListingReviewStats !== 'undefined' ? syncAllListingReviewStats : null;
 window.openCarImageModal = typeof openCarImageModal !== 'undefined' ? openCarImageModal : null;
 window.closeCarImageModal = typeof closeCarImageModal !== 'undefined' ? closeCarImageModal : null;
 window.toggleModalActualSize = typeof toggleModalActualSize !== 'undefined' ? toggleModalActualSize : null;
@@ -514,6 +516,78 @@ assert(newlyAddedReview.bookingCode === latestBooking.code, 'Newly submitted rev
 // Re-check Innova stats: must now have +1 review
 const updatedInnovaStats = getCarReviewStats(innovaListing);
 assert(updatedInnovaStats.count === innovaStats.count + 1, `Dynamic review counter incremented accurately (${innovaStats.count} -> ${updatedInnovaStats.count})`);
+
+// -------------------------------------------------------------
+// BMW X7 xDrive Review Isolation & Dummy Testimonial Sync Test
+// -------------------------------------------------------------
+const bmwListing = DUMMY_LISTINGS.find(l => (l.carName || '').includes('BMW X7'));
+assert(bmwListing, 'Found BMW X7 xDrive in DUMMY_LISTINGS');
+const initialBmwStats = getCarReviewStats(bmwListing);
+assert(initialBmwStats.count === 1, `BMW X7 initially has 1 dummy review (Found: ${initialBmwStats.count}, Kevin Sanjaya)`);
+
+// Simulate user "Ok Gas" booking BMW X7 xDrive
+mockWindow.currentUser = {
+    uid: 'renter-ok-gas-01',
+    first: 'Ok',
+    last: 'Gas',
+    email: 'okgas@gmail.com',
+    phone: '081284080866',
+    role: 'renter'
+};
+
+// Simulate booking BMW X7
+const bmwBooking = {
+    code: 'ANT-BMW-7788',
+    carId: 'dl-7',
+    listingId: 'dl-7',
+    carName: 'BMW X7 xDrive',
+    partnerName: 'Rental Mas Amba Semarang',
+    partnerPhone: '08123456789',
+    total: 2500000,
+    status: 'paid',
+    renterName: 'Ok Gas',
+    renterPhone: '081284080866',
+    createdAt: new Date().toISOString()
+};
+mockWindow.bookingHistory.unshift(bmwBooking);
+
+// Open review modal and submit review for BMW X7
+mockWindow.openTestimonialModal('BMW X7 xDrive');
+mockDocument.getElementById('reviewBookingSelect').value = bmwBooking.code;
+mockDocument.getElementById('reviewText').value = 'Masnya malah bawa tour ke Yerusolo jir, tapi mantap mobilnya nyaman pol';
+mockWindow.currentReviewRating = 4;
+mockWindow.submitCustomerTestimonial();
+
+// Validate BMW X7 now has exactly 2 reviews (dummy + Ok Gas)
+const updatedBmwStats = getCarReviewStats(bmwListing);
+assert(updatedBmwStats.count === 2, `BMW X7 now has exactly 2 reviews (Kevin Sanjaya + Ok Gas, Found: ${updatedBmwStats.count})`);
+
+// STRICT ISOLATION VALIDATION: Toyota Innova Reborn MUST NOT be contaminated by BMW X7 review!
+const innovaStatsAfterBmwReview = getCarReviewStats(innovaListing);
+assert(innovaStatsAfterBmwReview.count === updatedInnovaStats.count, `Isolation PASS: Toyota Innova Reborn was NOT contaminated by BMW review (Count: ${innovaStatsAfterBmwReview.count})`);
+
+// Test Corrupted CarId Self-Healing in mergeTestimonialsWithDefaults
+const mergeTestimonialsWithDefaults = mockWindow.mergeTestimonialsWithDefaults;
+assert(typeof mergeTestimonialsWithDefaults === 'function', 'mergeTestimonialsWithDefaults function exists');
+
+const corruptedInput = [
+    {
+        id: 'testi-corrupted-bmw',
+        carId: 'dl-1', // Corrupted ID (pointing to Innova instead of dl-7)
+        carName: 'BMW X7 xDrive',
+        author: 'Ok Gas',
+        rating: 4,
+        comment: '"Masnya malah bawa tour ke Yerusolo jir"'
+    }
+];
+const mergedResult = mergeTestimonialsWithDefaults(corruptedInput);
+const healedItem = mergedResult.find(t => t.id === 'testi-corrupted-bmw');
+assert(healedItem && healedItem.carId === 'dl-7', 'Self-Healing PASS: Corrupted carId healed from dl-1 to dl-7 based on carName');
+
+// Verify all 10 DEFAULT_TESTIMONIALS are preserved in mergedResult
+const defaultDummyPreserved = DEFAULT_TESTIMONIALS.every(d => mergedResult.some(m => m.id === d.id));
+assert(defaultDummyPreserved, 'Synchronization PASS: All 10 dummy reviews preserved in merged database pool');
+assert(mergedResult.length >= 11, `Pool length >= 11 with dummy + user reviews (Found: ${mergedResult.length})`);
 
 // =========================================================================
 // TEST SUITE 6: MITRA REGISTRATION WITH RENTAL LOCATION

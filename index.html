@@ -4919,8 +4919,13 @@
             const reviews = (typeof testimonialsPool !== 'undefined' ? testimonialsPool : []).filter(t => {
                 const tCarId = (t.carId || '').toLowerCase().trim();
                 const tCarName = (t.carName || '').toLowerCase().trim();
-                if (targetId && tCarId && targetId === tCarId) return true;
-                if (targetName && tCarName && targetName === tCarName) return true;
+                // Priority: match by carName if present on both
+                if (targetName && tCarName) {
+                    return targetName === tCarName;
+                }
+                if (targetId && tCarId) {
+                    return targetId === tCarId;
+                }
                 return false;
             });
 
@@ -8211,6 +8216,9 @@
             }
 
             alert('✅ Kartu Rental Resmi ' + name + ' berhasil disimpan ke database!');
+            if (typeof syncAllListingReviewStats === 'function') {
+                syncAllListingReviewStats();
+            }
             renderTestimonials();
             renderDriverCards();
             updateProfileModalUI();
@@ -9105,10 +9113,17 @@
                 endDate = startDate;
             }
 
+            // Look up matching listing to resolve carId
+            const matchedCar = (typeof allListings !== 'undefined' ? allListings : []).find(l => (l.carName || '').toLowerCase() === (car || '').toLowerCase())
+                || (typeof DUMMY_LISTINGS !== 'undefined' ? DUMMY_LISTINGS : []).find(l => (l.carName || '').toLowerCase() === (car || '').toLowerCase());
+            const resolvedCarId = matchedCar ? matchedCar.id : (typeof currentListing !== 'undefined' && currentListing ? currentListing.id : '');
+
             // Create current booking
             const code = 'ANT-' + Date.now().toString().slice(-8).toUpperCase();
             currentBooking = {
                 code,
+                carId: resolvedCarId,
+                listingId: resolvedCarId,
                 carName: car,
                 partnerName: mitra,
                 partnerPhone: '08123456789',
@@ -10316,9 +10331,13 @@
                 return;
             }
 
-            const carId       = selectedOpt.getAttribute('data-car-id') || (currentListing ? currentListing.id : 'dl-1');
-            const carName     = selectedOpt.getAttribute('data-car-name') || (currentListing ? currentListing.carName : 'Toyota Innova Reborn');
-            const partnerName = selectedOpt.getAttribute('data-partner-name') || (currentListing ? currentListing.partnerName : 'Rental Mas Amba Semarang');
+            const rawCarName  = selectedOpt.getAttribute('data-car-name') || (currentListing ? currentListing.carName : 'Toyota Innova Reborn');
+            const matchedCar  = (typeof allListings !== 'undefined' ? allListings : []).find(l => (l.carName || '').toLowerCase() === (rawCarName || '').toLowerCase())
+                || (typeof DUMMY_LISTINGS !== 'undefined' ? DUMMY_LISTINGS : []).find(l => (l.carName || '').toLowerCase() === (rawCarName || '').toLowerCase());
+            const optCarId    = selectedOpt.getAttribute('data-car-id');
+            const carId       = (matchedCar ? matchedCar.id : optCarId) || (currentListing ? currentListing.id : 'dl-1');
+            const carName     = matchedCar ? matchedCar.carName : rawCarName;
+            const partnerName = selectedOpt.getAttribute('data-partner-name') || (currentListing ? currentListing.partnerName : (matchedCar ? matchedCar.partnerName : 'Rental Mas Amba Semarang'));
             const bookingCode = selectedOpt.value;
 
             const newTesti = {
@@ -10372,6 +10391,9 @@
                 } catch(e) {}
             }
 
+            if (typeof syncAllListingReviewStats === 'function') {
+                syncAllListingReviewStats();
+            }
             renderTestimonials();
             if (typeof currentListing !== 'undefined' && currentListing) {
                 renderDetailReviews(currentListing);
@@ -10450,7 +10472,8 @@
                 author: 'Mas Reja Kurniawan',
                 role: 'Penyewa Terverifikasi',
                 rating: 5,
-                comment: '"Unit Innova Reborn sangat prima, AC dingin sampai baris ketiga dan suspensi empuk. Sangat nyaman untuk keliling wisata kuliner Semarang bersama keluarga."'
+                comment: '"Unit Innova Reborn sangat prima, AC dingin sampai baris ketiga dan suspensi empuk. Sangat nyaman untuk keliling wisata kuliner Semarang bersama keluarga."',
+                createdAt: '2026-10-01T08:00:00.000Z'
             },
             {
                 id: 't-zenix-1',
@@ -10460,7 +10483,8 @@
                 author: 'Ibu Rina M.',
                 role: 'Turis Domestik',
                 rating: 5,
-                comment: '"Sewa Innova Zenix di Anterin emang terbaik. Suspensi empuk banget, anak-anak sampai tidur pules sepanjang jalan dari bandara. Driver ramah dan sabar nunggu."'
+                comment: '"Sewa Innova Zenix di Anterin emang terbaik. Suspensi empuk banget, anak-anak sampai tidur pules sepanjang jalan dari bandara. Driver ramah dan sabar nunggu."',
+                createdAt: '2026-10-01T08:05:00.000Z'
             },
             {
                 id: 't-fortuner-1',
@@ -10470,7 +10494,8 @@
                 author: 'Agus Pratama',
                 role: 'Kontraktor Proyek',
                 rating: 5,
-                comment: '"Mobil Fortuner GR-nya gagah dan terawat. Buat ngecek proyek di area pinggiran Semarang tetap berasa nyaman dan prestisenya dapet. Mantap pelayanannya Anterin!"'
+                comment: '"Mobil Fortuner GR-nya gagah dan terawat. Buat ngecek proyek di area pinggiran Semarang tetap berasa nyaman dan prestisenya dapet. Mantap pelayanannya Anterin!"',
+                createdAt: '2026-10-01T08:10:00.000Z'
             },
             {
                 id: 't-alphard-1',
@@ -10480,7 +10505,8 @@
                 author: 'Budi Santoso',
                 role: 'CEO Perusahaan Logistik',
                 rating: 5,
-                comment: '"Pelayanan VVIP sungguh luar biasa. Sopirnya sangat profesional, Alphard-nya wangi dan spotless. Sangat memuaskan untuk agenda rapat dinas saya di Semarang tanpa ribet."'
+                comment: '"Pelayanan VVIP sungguh luar biasa. Sopirnya sangat profesional, Alphard-nya wangi dan spotless. Sangat memuaskan untuk agenda rapat dinas saya di Semarang tanpa ribet."',
+                createdAt: '2026-10-01T08:15:00.000Z'
             },
             {
                 id: 't-hiace-1',
@@ -10490,7 +10516,8 @@
                 author: 'Keluarga Dimas A.',
                 role: 'Family Traveler',
                 rating: 5,
-                comment: '"Paket Grand Tour dengan Hiace Premio recommended! Kabin luas untuk 12 orang, drivernya hafal jalan tembusan. Liburan road-trip keluarga di Jateng jadi nggak capek sama sekali."'
+                comment: '"Paket Grand Tour dengan Hiace Premio recommended! Kabin luas untuk 12 orang, drivernya hafal jalan tembusan. Liburan road-trip keluarga di Jateng jadi nggak capek sama sekali."',
+                createdAt: '2026-10-01T08:20:00.000Z'
             },
             {
                 id: 't-sclass-1',
@@ -10500,7 +10527,8 @@
                 author: 'Hendra Wijaya',
                 role: 'Event Organizer Executive',
                 rating: 5,
-                comment: '"Standar keamanan dan kenyamanan kelas atas. Saya pakai S-Class untuk menjemput klien VIP dari luar negeri, dan mereka sangat terkesan dengan ketenangan supir."'
+                comment: '"Standar keamanan dan kenyamanan kelas atas. Saya pakai S-Class untuk menjemput klien VIP dari luar negeri, dan mereka sangat terkesan dengan ketenangan supir."',
+                createdAt: '2026-10-01T08:25:00.000Z'
             },
             {
                 id: 't-bmwx7-1',
@@ -10510,7 +10538,8 @@
                 author: 'Kevin Sanjaya',
                 role: 'Pengusaha Muda',
                 rating: 5,
-                comment: '"BMW X7 tarikannya buas dan panoramic sky lounge-nya juara banget pas malam hari. Interior super mewah dan pelayanan Mas Amba top notch."'
+                comment: '"BMW X7 tarikannya buas dan panoramic sky lounge-nya juara banget pas malam hari. Interior super mewah dan pelayanan Mas Amba top notch."',
+                createdAt: '2026-10-01T08:30:00.000Z'
             },
             {
                 id: 't-rangerover-1',
@@ -10520,7 +10549,8 @@
                 author: 'Linda Kusuma',
                 role: 'Direktur Marketing',
                 rating: 5,
-                comment: '"Kualitas layanannya nggak main-main. Admin responsif pas booking, Range Rover on-time, dan supir rapi banget. Pasti bakal langganan terus kalau ada kerjaan ke Jawa Tengah."'
+                comment: '"Kualitas layanannya nggak main-main. Admin responsif pas booking, Range Rover on-time, dan supir rapi banget. Pasti bakal langganan terus kalau ada kerjaan ke Jawa Tengah."',
+                createdAt: '2026-10-01T08:35:00.000Z'
             },
             {
                 id: 't-lexus-1',
@@ -10530,7 +10560,8 @@
                 author: 'Sarah T.',
                 role: 'Public Figure / Influencer',
                 rating: 5,
-                comment: '"Privasi sangat terjaga. Pakai Lexus LM benar-benar berasa di lounge pribadi. Kaca sekatnya sangat membantu untuk online meeting di jalan. Highly recommended!"'
+                comment: '"Privasi sangat terjaga. Pakai Lexus LM benar-benar berasa di lounge pribadi. Kaca sekatnya sangat membantu untuk online meeting di jalan. Highly recommended!"',
+                createdAt: '2026-10-01T08:40:00.000Z'
             },
             {
                 id: 't-audi-1',
@@ -10540,20 +10571,71 @@
                 author: 'Denny Haryanto',
                 role: 'Konsultan Keuangan',
                 rating: 5,
-                comment: '"Audi A8 L luar biasa nyaman. Suspensi udara lembut dan ruang kaki sangat lapang. Driver sangat paham etika bisnis eksekutif."'
+                comment: '"Audi A8 L luar biasa nyaman. Suspensi udara lembut dan ruang kaki sangat lapang. Driver sangat paham etika bisnis eksekutif."',
+                createdAt: '2026-10-01T08:45:00.000Z'
             }
         ];
 
-        let testimonialsPool = [...DEFAULT_TESTIMONIALS];
+        // SINKRONISASI & DEDUPLIKASI TESTIMONI DUMMY + TESTIMONI BARU
+        function mergeTestimonialsWithDefaults(items) {
+            const result = [];
+            const seenKeys = new Set();
 
-        // Setelah testimonialsPool diinisialisasi, sinkronisasi rating tiap unit dari ulasan riil
-        allListings.forEach(l => {
-            const stats = getCarReviewStats(l);
-            l.total_ratingperunit = stats.total_ratingperunit;
-            l.total_testimoninya = stats.total_testimoninya;
-            l.rating = Number(stats.rating);
-            l.totalReviews = stats.count;
-        });
+            function sanitizeItem(t) {
+                if (!t) return null;
+                const copy = { ...t };
+                const tName = (copy.carName || '').trim();
+                if (tName) {
+                    const matched = (typeof allListings !== 'undefined' ? allListings : []).find(l => (l.carName || '').toLowerCase() === tName.toLowerCase())
+                        || (typeof DUMMY_LISTINGS !== 'undefined' ? DUMMY_LISTINGS : []).find(l => (l.carName || '').toLowerCase() === tName.toLowerCase());
+                    if (matched) {
+                        copy.carId = matched.id;
+                        copy.carName = matched.carName;
+                    }
+                }
+                return copy;
+            }
+
+            // 1. Ulasan baru / hasil input pengguna diprioritaskan di awal antrian
+            if (Array.isArray(items)) {
+                items.forEach(raw => {
+                    const item = sanitizeItem(raw);
+                    if (!item) return;
+                    const key = item.id || `${item.carName || ''}|${item.author || ''}|${item.comment || ''}`;
+                    if (!seenKeys.has(key)) {
+                        seenKeys.add(key);
+                        result.push(item);
+                    }
+                });
+            }
+
+            // 2. Gabungkan seluruh DEFAULT_TESTIMONIALS dummy agar tidak pernah hilang
+            DEFAULT_TESTIMONIALS.forEach(d => {
+                const key = d.id;
+                const contentKey = `${d.carName}|${d.author}|${d.comment}`;
+                if (!seenKeys.has(key) && !seenKeys.has(contentKey)) {
+                    seenKeys.add(key);
+                    seenKeys.add(contentKey);
+                    result.push({ ...d });
+                }
+            });
+
+            return result;
+        }
+
+        function syncAllListingReviewStats() {
+            if (typeof allListings === 'undefined' || !Array.isArray(allListings)) return;
+            allListings.forEach(l => {
+                const stats = getCarReviewStats(l);
+                l.total_ratingperunit = stats.total_ratingperunit;
+                l.total_testimoninya = stats.total_testimoninya;
+                l.rating = Number(stats.rating);
+                l.totalReviews = stats.count;
+            });
+        }
+
+        let testimonialsPool = mergeTestimonialsWithDefaults([]);
+        syncAllListingReviewStats();
 
         function renderTestimonials() {
             const track = document.getElementById('testiSliderTrack');
@@ -10595,6 +10677,9 @@
             } else if (testimonialsPool && testimonialsPool.length > 1) {
                 testimonialsPool = [...testimonialsPool].sort(() => Math.random() - 0.5);
             }
+            if (typeof syncAllListingReviewStats === 'function') {
+                syncAllListingReviewStats();
+            }
             renderTestimonials();
             if (showToastNotice && typeof showToast === 'function') {
                 showToast('Menampilkan ulasan dan testimoni pelanggan lainnya.', 'success');
@@ -10624,8 +10709,13 @@
             const matches = testimonialsPool.filter(t => {
                 const tCarId = (t.carId || '').toLowerCase().trim();
                 const tCarName = (t.carName || '').toLowerCase().trim();
-                if (targetId && tCarId && targetId === tCarId) return true;
-                if (targetName && tCarName && targetName === tCarName) return true;
+                // Priority: match by carName if present on both
+                if (targetName && tCarName) {
+                    return targetName === tCarName;
+                }
+                if (targetId && tCarId) {
+                    return targetId === tCarId;
+                }
                 return false;
             });
 
@@ -10714,26 +10804,48 @@
                 const cached = localStorage.getItem('anterin_testimonials_v2');
                 if (cached) {
                     const parsed = JSON.parse(cached);
-                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].carName) {
-                        testimonialsPool = parsed;
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        testimonialsPool = mergeTestimonialsWithDefaults(parsed);
+                        syncAllListingReviewStats();
                     }
                 }
             } catch(e) {}
 
             if (firebaseReady && fbDb) {
+                // Seed DEFAULT_TESTIMONIALS ke database Firestore agar selalu tersinkronisasi
+                try {
+                    DEFAULT_TESTIMONIALS.forEach(d => {
+                        fbDb.collection('testimonials').doc(d.id).set({
+                            ...d,
+                            isDummy: true,
+                            createdAt: d.createdAt || '2026-10-01T00:00:00.000Z'
+                        }, { merge: true }).catch(err => console.warn('Sync default testi to Firestore:', err.message));
+                    });
+                } catch(e) {}
+
                 fbDb.collection('testimonials').orderBy('createdAt', 'desc').onSnapshot(snap => {
                     if (snap && !snap.empty) {
                         const items = [];
-                        snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
-                        if (items.length > 0) {
-                            testimonialsPool = items;
-                            renderTestimonials();
-                            if (typeof currentListing !== 'undefined' && currentListing) {
-                                renderDetailReviews(currentListing);
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            // Self-healing: koreksi otomatis jika ulasan BMW X7 tersimpan dengan carId dl-1
+                            if ((data.carName || '').toLowerCase() === 'bmw x7 xdrive' && data.carId === 'dl-1') {
+                                doc.ref.update({ carId: 'dl-7' }).catch(() => {});
+                                data.carId = 'dl-7';
                             }
-                            if (typeof renderBrowseListings === 'function') {
-                                renderBrowseListings();
-                            }
+                            items.push({ id: doc.id, ...data });
+                        });
+                        testimonialsPool = mergeTestimonialsWithDefaults(items);
+                        try {
+                            localStorage.setItem('anterin_testimonials_v2', JSON.stringify(testimonialsPool));
+                        } catch(e) {}
+                        syncAllListingReviewStats();
+                        renderTestimonials();
+                        if (typeof currentListing !== 'undefined' && currentListing) {
+                            renderDetailReviews(currentListing);
+                        }
+                        if (typeof renderBrowseListings === 'function') {
+                            renderBrowseListings();
                         }
                     }
                 }, err => console.warn('Firestore testimonials listener:', err.message));
@@ -10764,6 +10876,9 @@
         setTimeout(() => {
             renderDriverCards();
             initTestimonialsSync();
+            if (typeof syncAllListingReviewStats === 'function') {
+                syncAllListingReviewStats();
+            }
             renderTestimonials();
         // Check for password reset oobCode in URL (jika buka link dari email)
         try {
