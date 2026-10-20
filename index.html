@@ -5371,6 +5371,10 @@
                 createdAt: new Date().toISOString()
             };
 
+            const formatReceiptDate = (d) => String(d || '').replace(/T(?=\d)/g, 'T ').trim();
+            const sDate = formatReceiptDate(currentBooking.startDate);
+            const eDate = formatReceiptDate(currentBooking.endDate);
+
             // Fill summary
             const totEl = document.getElementById('checkoutTotalDisplay');
             if (totEl) totEl.textContent = `Rp ${currentBooking.total.toLocaleString('id')}`;
@@ -5382,7 +5386,7 @@
                         <tr><td style="color:#94a3b8; padding:7px 0;">Mitra</td><td style="font-weight:700;">${currentBooking.partnerName}</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">Layanan</td><td style="font-weight:700;">${currentBooking.supir}</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">Penyewa</td><td style="font-weight:700;">${currentBooking.renterName}</td></tr>
-                        <tr><td style="color:#94a3b8; padding:7px 0;">Tanggal</td><td style="font-weight:700;">${currentBooking.startDate} → ${currentBooking.endDate}</td></tr>
+                        <tr><td style="color:#94a3b8; padding:7px 0;">Tanggal</td><td style="font-weight:700;">${sDate} → ${eDate}</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">Durasi</td><td style="font-weight:700;">${currentBooking.days} hari</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">Lokasi / Serah Terima</td><td style="font-weight:700;">${currentBooking.pickup}</td></tr>
                         <tr style="border-top:1px solid #e2e8f0;"><td style="padding-top:10px; font-weight:800; color:var(--navy);">Total</td><td style="padding-top:10px; font-weight:800; color:var(--gold); font-size:16px;">Rp ${currentBooking.total.toLocaleString('id')}</td></tr>
@@ -5468,6 +5472,10 @@
                 ? `<tr><td>Lokasi Pengambilan</td><td><i class="fa-solid fa-building-circle-check" style="color:#2563eb;"></i> Kantor Rental Resmi ${currentBooking.partnerName}<br><small style="color:#64748b;">${currentBooking.pickup}</small></td></tr>`
                 : `<tr><td>Titik Penjemputan</td><td><i class="fa-solid fa-location-dot" style="color:var(--gold);"></i> ${currentBooking.pickup}</td></tr>`;
 
+            const formatReceiptDate = (d) => String(d || '').replace(/T(?=\d)/g, 'T ').trim();
+            const sDate = formatReceiptDate(currentBooking.startDate);
+            const eDate = formatReceiptDate(currentBooking.endDate);
+
             document.getElementById('successBookingCode').textContent = currentBooking.code;
             document.getElementById('successReceiptTable').innerHTML = `
                 <tr><td>Mobil</td><td>${currentBooking.carName}</td></tr>
@@ -5475,7 +5483,7 @@
                 <tr><td>Penyewa</td><td>${currentBooking.renterName}</td></tr>
                 <tr><td>Nomor WhatsApp</td><td>${currentBooking.renterPhone}</td></tr>
                 <tr><td>Layanan / Supir</td><td>${currentBooking.supir}</td></tr>
-                <tr><td>Jadwal Sewa</td><td>${currentBooking.startDate} s/d ${currentBooking.endDate}</td></tr>
+                <tr><td>Jadwal Sewa</td><td>${sDate} s/d ${eDate} (${currentBooking.days} Hari)</td></tr>
                 ${locRow}
                 <tr><td>Metode</td><td>QRIS Standar Nasional (GPN)</td></tr>
                 <tr><td><strong>Total</strong></td><td><strong style="color:var(--gold);">Rp ${currentBooking.total.toLocaleString('id')}</strong></td></tr>
@@ -5486,26 +5494,33 @@
         function shareToWhatsApp(target = 'renter') {
             if (!currentBooking) return;
             const isSelfDrive = (currentBooking.serviceType === 'self-drive' || (currentBooking.supir && currentBooking.supir.toLowerCase().includes('lepas kunci')));
-            const locLabel = isSelfDrive ? 'Lokasi Pengambilan (Pool Mitra)' : 'Titik Jemput';
+            const locLabel = isSelfDrive ? 'Titik Ambil' : 'Titik Jemput';
             const extraNote = isSelfDrive
-                ? `*Catatan Penting:* Silakan datangi kantor rental mitra kami di atas dengan membawa KTP & SIM A asli untuk proses serah terima unit kendaraan.\n\n`
-                : `*Catatan:* Driver profesional kami akan menjemput tepat waktu di titik penjemputan yang ditentukan.\n\n`;
+                ? `Catatan: Silakan datangi kantor rental mitra resmi kami di atas dengan membawa KTP & SIM A asli untuk proses serah terima unit kendaraan.\n\n`
+                : `Catatan: Driver profesional kami akan menjemput tepat waktu di titik penjemputan yang ditentukan.\n\n`;
+
+            const formatReceiptDate = (d) => String(d || '').replace(/T(?=\d)/g, 'T ').trim();
+            const sDate = formatReceiptDate(currentBooking.startDate);
+            const eDate = formatReceiptDate(currentBooking.endDate);
+            const pad = (str, len = 13) => str.padEnd(len, ' ');
 
             const msg = `*KONFIRMASI BOOKING & STRUK RESMI ANTERIN*\n\n`
                 + `Halo *${currentBooking.renterName}*! Berikut rincian reservasi rental armada Anda:\n\n`
-                + `Kode Booking : *${currentBooking.code}*\n`
-                + `Unit Mobil   : ${currentBooking.carName}\n`
-                + `Mitra Rental : ${currentBooking.partnerName}\n`
-                + `Layanan      : ${currentBooking.supir}\n`
-                + `Penyewa      : ${currentBooking.renterName}\n`
-                + `Nomor WA     : ${currentBooking.renterPhone}\n`
-                + `Jadwal Sewa  : ${currentBooking.startDate} s/d ${currentBooking.endDate} (${currentBooking.days} Hari)\n`
-                + `${locLabel} : ${currentBooking.pickup}\n`
-                + `Metode       : QRIS Standar Nasional (GPN)\n`
-                + `Total Bayar  : Rp ${currentBooking.total.toLocaleString('id')}\n`
-                + `Status       : *LUNAS & TERKONFIRMASI*\n\n`
+                + `\`\`\`\n`
+                + `${pad('Kode Booking')} : ${currentBooking.code}\n`
+                + `${pad('Unit Mobil')} : ${currentBooking.carName}\n`
+                + `${pad('Mitra Rental')} : ${currentBooking.partnerName}\n`
+                + `${pad('Layanan')} : ${currentBooking.supir}\n`
+                + `${pad('Penyewa')} : ${currentBooking.renterName}\n`
+                + `${pad('Nomor WA')} : ${currentBooking.renterPhone}\n`
+                + `${pad('Jadwal Sewa')} : ${sDate} s/d ${eDate} (${currentBooking.days} Hari)\n`
+                + `${pad(locLabel)} : ${currentBooking.pickup}\n`
+                + `${pad('Metode')} : QRIS Standar Nasional (GPN)\n`
+                + `${pad('Total Bayar')} : Rp ${currentBooking.total.toLocaleString('id')}\n`
+                + `${pad('Status')} : LUNAS & TERKONFIRMASI\n`
+                + `\`\`\`\n\n`
                 + extraNote
-                + `Unit kendaraan akan disiapkan tepat waktu. Terima kasih telah memilih Anterin!\nwww.anterin.web.id`;
+                + `Unit kendaraan akan disiapkan tepat waktu. Terima kasih sudah menggunakan Anterin.\nhttps://anterin-v2.vercel.app`;
 
             const rawPhone = (target === 'renter' ? (currentBooking.renterPhone || '') : (currentBooking.partnerPhone || ''));
             let phone = rawPhone.replace(/[^0-9]/g, '');
@@ -9115,6 +9130,10 @@
             const totalDisplay = document.getElementById('checkoutTotalDisplay');
             if (totalDisplay) totalDisplay.textContent = `Rp ${total.toLocaleString('id')}`;
 
+            const formatReceiptDate = (d) => String(d || '').replace(/T(?=\d)/g, 'T ').trim();
+            const sDate = formatReceiptDate(currentBooking.startDate);
+            const eDate = formatReceiptDate(currentBooking.endDate);
+
             const summaryEl = document.getElementById('checkoutSummaryContent');
             if (summaryEl) {
                 summaryEl.innerHTML = `
@@ -9124,7 +9143,7 @@
                         <tr><td style="color:#94a3b8; padding:7px 0;">Layanan / Supir</td><td style="font-weight:700;">${currentBooking.supir}</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">Nama Penyewa</td><td style="font-weight:700;">${currentBooking.renterName}</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">Nomor WhatsApp</td><td style="font-weight:700;">${currentBooking.renterPhone}</td></tr>
-                        <tr><td style="color:#94a3b8; padding:7px 0;">Jadwal Sewa</td><td style="font-weight:700;">${currentBooking.startDate} s/d ${currentBooking.endDate}</td></tr>
+                        <tr><td style="color:#94a3b8; padding:7px 0;">Jadwal Sewa</td><td style="font-weight:700;">${sDate} s/d ${eDate}</td></tr>
                         <tr><td style="color:#94a3b8; padding:7px 0;">${isSelfDrive ? 'Lokasi Pengambilan' : 'Titik Penjemputan'}</td><td style="font-weight:700;">${currentBooking.pickup}</td></tr>
                         <tr style="border-top:1px solid #e2e8f0;"><td style="padding-top:10px; font-weight:800; color:var(--navy);">Total Bayar</td><td style="padding-top:10px; font-weight:800; color:var(--gold); font-size:18px;">Rp ${currentBooking.total.toLocaleString('id')}</td></tr>
                     </table>

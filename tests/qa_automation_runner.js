@@ -836,6 +836,18 @@ const sopirReceipt = mockDocument.getElementById('successReceiptTable').innerHTM
 assert(sopirReceipt.includes('Titik Penjemputan'), 'Receipt Sopir PASS: Uses label "Titik Penjemputan"');
 assert(sopirReceipt.includes('Samping Indomaret Imam Bonjol'), 'Receipt Sopir PASS: Displays custom customer pickup point');
 
+// Case C: WhatsApp Struk Formatting & Hyperlink Verification
+let openedWaUrl = '';
+mockWindow.open = (url) => { openedWaUrl = url; };
+mockWindow.currentBooking.startDate = '2026-10-22T08:00';
+mockWindow.currentBooking.endDate = '2026-10-22T08:00';
+mockWindow.shareToWhatsApp('renter');
+assert(openedWaUrl.includes('https://wa.me/'), 'WhatsApp Struk PASS: Generates valid wa.me link');
+const decodedWaMsg = decodeURIComponent(openedWaUrl);
+assert(decodedWaMsg.includes('2026-10-22T 08:00'), 'WhatsApp Struk PASS: Formats ISO datetime with space (2026-10-22T 08:00)');
+assert(decodedWaMsg.includes('https://anterin-v2.vercel.app'), 'WhatsApp Struk PASS: Directs to https://anterin-v2.vercel.app');
+assert(decodedWaMsg.includes('Terima kasih sudah menggunakan Anterin.'), 'WhatsApp Struk PASS: Contains closing text "Terima kasih sudah menggunakan Anterin."');
+
 // =========================================================================
 // TEST SUITE 11: VERCEL DEPLOYMENT CONFIGURATION & RESPONSIVE VALIDATION
 // =========================================================================
