@@ -3973,6 +3973,12 @@
                 Selesaikan pemesanan rental armada terlebih dahulu untuk dapat memberikan penilaian dan testimoni.
             </div>
 
+            <!-- 1 perjalanan = 1 testimoni — notice -->
+            <div id="reviewAlreadyDoneNotice" style="display:none; background:#fef9c3; border:1px solid #fde047; border-radius:12px; padding:14px; margin-bottom:18px; font-size:13px; color:#92400e; line-height:1.5;">
+                <i class="fa-solid fa-circle-info"></i> <strong>Perjalanan ini sudah pernah Anda ulas.</strong><br>
+                Setiap perjalanan hanya dapat diulas satu kali. Pilih perjalanan lain untuk menambahkan ulasan.
+            </div>
+
             <div class="auth-input-group" style="margin-bottom:16px;">
                 <label>Pilih Histori Rental yang Diulas</label>
                 <select id="reviewBookingSelect" style="width:100%; padding:13px 14px; border:1.5px solid #e2e8f0; border-radius:10px; font-family:'Urbanist',sans-serif; font-size:14px; outline:none;">
@@ -4712,7 +4718,13 @@
             }
         }
 
-        function goToRiwayat()  { renderRiwayat(); showOnly(riwayatPage); }
+        function goToRiwayat()  {
+            if (currentUser && currentUser.uid && typeof restoreBookingHistoryForUser === 'function') {
+                restoreBookingHistoryForUser(currentUser.uid);
+            }
+            renderRiwayat();
+            showOnly(riwayatPage);
+        }
 
         function loginAsMasAmba() {
             currentUser = {
@@ -5466,6 +5478,20 @@
             // Add to local history
             bookingHistory.unshift({ ...currentBooking });
 
+            // ============================================================
+            // PERSIST booking history to localStorage per user
+            // ============================================================
+            try {
+                const uid = currentUser?.uid || 'guest-user';
+                const storageKey = 'anterin_bookings_' + uid;
+                const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                const existingCodes = new Set(existing.map(b => b.code));
+                if (!existingCodes.has(currentBooking.code)) {
+                    existing.unshift({ ...currentBooking });
+                }
+                localStorage.setItem(storageKey, JSON.stringify(existing));
+            } catch(e) {}
+
             // Immediately reflect in calendar & driver conflict maps
             syncBookingToCalendar(currentBooking);
             renderCalendar();
@@ -5549,20 +5575,31 @@
                 el.innerHTML = `<div style="text-align:center; padding:60px; color:#94a3b8;"><i class="fa-solid fa-calendar-xmark" style="font-size:48px; margin-bottom:12px; display:block;"></i><p>Belum ada riwayat booking.</p></div>`;
                 return;
             }
-            el.innerHTML = bookingHistory.map(b => `
-                <div style="background:white; border-radius:16px; border:1px solid #e2e8f0; padding:22px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; gap:16px;">
+            const reviewedCodes = new Set(
+                (typeof testimonialsPool !== 'undefined' ? testimonialsPool : []).filter(t => t.bookingCode).map(t => t.bookingCode)
+            );
+            el.innerHTML = bookingHistory.map(b => {
+                const isReviewed = reviewedCodes.has(b.code);
+                return `
+                <div style="background:white; border-radius:16px; border:1px solid #e2e8f0; padding:22px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
                     <div>
                         <div style="font-family:'Urbanist',sans-serif; font-size:16px; font-weight:800; color:var(--navy); margin-bottom:4px;">${b.carName}</div>
                         <div style="font-size:13px; color:#94a3b8;">${b.partnerName} &bull; ${b.startDate} → ${b.endDate}</div>
                         <div style="font-size:13px; color:#64748b; margin-top:4px;">${b.pickup}</div>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-family:'Urbanist',sans-serif; font-size:17px; font-weight:800; color:var(--gold);">Rp ${b.total.toLocaleString('id')}</div>
-                        <span class="booking-status ${b.status}"><i class="fa-solid fa-circle" style="font-size:7px;"></i> ${b.status.toUpperCase()}</span>
+                        <div style="font-family:'Urbanist',sans-serif; font-size:17px; font-weight:800; color:var(--gold);">Rp ${(b.total || 0).toLocaleString('id')}</div>
+                        <span class="booking-status ${b.status}"><i class="fa-solid fa-circle" style="font-size:7px;"></i> ${(b.status || 'PAID').toUpperCase()}</span>
                         <div style="font-size:11px; color:#94a3b8; margin-top:4px; font-family:monospace;">${b.code}</div>
+                        <div style="margin-top:6px;">
+                            ${isReviewed 
+                                ? `<span style="font-size:11px; color:#059669; background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 8px; border-radius:12px; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Sudah Diulas</span>`
+                                : `<button onclick="openTestimonialModal('${(b.carName || '').replace(/'/g, "\\'")}')" style="background:#fefce8; border:1px solid #fde047; color:var(--navy); padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;"><i class="fa-solid fa-pen-to-square"></i> Beri Ulasan</button>`
+                            }
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         // =============================================
@@ -6342,6 +6379,9 @@
                                 role: d.role || 'renter',
                                 businessName: d.businessName || '',
                                 hasSIM: d.hasSIM || false,
+                                hasKTP: d.hasKTP || false,
+                                ktpUrl: d.ktpUrl || null,
+                                simUrl: d.simUrl || null,
                                 avatarDataUrl: d.avatarUrl || null,
                                 rentalCard: d.rentalCard || null
                             };
@@ -6349,7 +6389,27 @@
                                 DEFAULT_PARTNER_PROFILES[d.businessName] = d.rentalCard;
                             }
                             isLoggedIn = true;
+
+                            // ============================================================
+                            // RESTORE KTP / SIM preview photos from Firestore
+                            // ============================================================
+                            if (currentUser.ktpUrl) {
+                                const prev = document.getElementById('profileKTPPreview');
+                                if (prev) { prev.src = currentUser.ktpUrl; prev.style.display = 'block'; }
+                            }
+                            if (currentUser.simUrl) {
+                                const prev = document.getElementById('profileSIMPreview');
+                                if (prev) { prev.src = currentUser.simUrl; prev.style.display = 'block'; }
+                            }
+
                             updateUIAfterLogin();
+
+                            // Restore booking history (async - will update riwayat when ready)
+                            setTimeout(() => {
+                                if (typeof restoreBookingHistoryForUser === 'function') {
+                                    restoreBookingHistoryForUser(user.uid);
+                                }
+                            }, 200);
                         }
                     } catch(e) {
                         console.warn("Failed fetching user doc:", e);
@@ -7226,16 +7286,32 @@
                         fullAddress: d.fullAddress || d.address || '',
                         gmaps: d.gmaps || '',
                         hasSIM: d.hasSIM || false,
+                        hasKTP: d.hasKTP || false,
+                        ktpUrl: d.ktpUrl || null,
+                        simUrl: d.simUrl || null,
                         avatarDataUrl: d.avatarUrl || user.photoURL || null,
                         rentalCard: d.rentalCard || null
                     };
                     if (d.rentalCard && typeof DEFAULT_PARTNER_PROFILES !== 'undefined' && d.businessName) {
                         DEFAULT_PARTNER_PROFILES[d.businessName] = d.rentalCard;
                     }
+                    // Restore KTP / SIM preview
+                    if (currentUser.ktpUrl) {
+                        const prev = document.getElementById('profileKTPPreview');
+                        if (prev) { prev.src = currentUser.ktpUrl; prev.style.display = 'block'; }
+                    }
+                    if (currentUser.simUrl) {
+                        const prev = document.getElementById('profileSIMPreview');
+                        if (prev) { prev.src = currentUser.simUrl; prev.style.display = 'block'; }
+                    }
                 }
 
                 isLoggedIn = true;
                 updateUIAfterLogin();
+
+                // Restore booking history for this user
+                restoreBookingHistoryForUser(user.uid);
+
                 if (currentUser.role === 'mitra') {
                     goToMitraDashboard();
                 } else {
@@ -7249,6 +7325,99 @@
                     alert("⚠️ Layanan masuk dengan Google sedang tidak tersedia. Silakan gunakan email dan password.");
                 } else {
                     alert(getAuthErrorMessage(err));
+                }
+            }
+        }
+
+        // ============================================================
+        // RESTORE BOOKING HISTORY helper (shared by Firebase + Google Auth)
+        // ============================================================
+        async function restoreBookingHistoryForUser(uid) {
+            if (!uid) return;
+            const userEmail = (currentUser && currentUser.email ? currentUser.email.toLowerCase() : '');
+            const userPhone = (currentUser && currentUser.phone ? currentUser.phone.replace(/[^0-9]/g, '') : '');
+            const userName = (currentUser && currentUser.first ? currentUser.first.toLowerCase() : '');
+
+            // 1) First load from localStorage for instantaneous UI render
+            try {
+                const cachedUser = localStorage.getItem('anterin_bookings_' + uid);
+                const cachedAll = localStorage.getItem('anterin_all_bookings');
+                const raw = cachedUser || cachedAll;
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        const existingCodes = new Set(bookingHistory.map(b => b.code));
+                        parsed.forEach(b => {
+                            if (!existingCodes.has(b.code)) {
+                                bookingHistory.push(b);
+                                existingCodes.add(b.code);
+                            }
+                        });
+                        bookingHistory.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                        if (typeof renderRiwayat === 'function') renderRiwayat();
+                    }
+                }
+            } catch(e) {}
+
+            // 2) Sync from Firestore (without composite index requirement!)
+            if (firebaseReady && fbDb) {
+                try {
+                    const bookSnap = await fbDb.collection('bookings').get();
+                    if (!bookSnap.empty) {
+                        const firestoreBookings = [];
+                        bookSnap.forEach(bDoc => {
+                            const bd = bDoc.data();
+                            const bEmail = (bd.renterEmail || '').toLowerCase();
+                            const bPhone = (bd.renterPhone || '').replace(/[^0-9]/g, '');
+                            const bName = (bd.renterName || '').toLowerCase();
+                            const isMatch = (bd.renterId && bd.renterId === uid) ||
+                                            (userEmail && bEmail && bEmail === userEmail) ||
+                                            (userPhone && bPhone && (bPhone === userPhone || bPhone.endsWith(userPhone) || userPhone.endsWith(bPhone))) ||
+                                            (userName && bName && (bName.includes(userName) || userName.includes(bName)));
+                            if (isMatch) {
+                                firestoreBookings.push({
+                                    id: bDoc.id,
+                                    code: bd.code || bDoc.id,
+                                    carId: bd.carId || bd.listingId || '',
+                                    listingId: bd.listingId || bd.carId || '',
+                                    carName: bd.carName || '',
+                                    partnerName: bd.partnerName || '',
+                                    partnerPhone: bd.partnerPhone || '08123456789',
+                                    paketName: bd.paketName || 'Paket Rental',
+                                    serviceType: bd.serviceType || 'driver',
+                                    pickup: bd.pickup || '',
+                                    startDate: bd.startDate || '',
+                                    endDate: bd.endDate || '',
+                                    days: bd.days || 1,
+                                    total: bd.total || 0,
+                                    supir: bd.supir || '',
+                                    status: bd.status || 'paid',
+                                    renterName: bd.renterName || (currentUser ? currentUser.first : ''),
+                                    renterPhone: bd.renterPhone || (currentUser ? currentUser.phone : ''),
+                                    createdAt: bd.createdAt || (bd.paidAt && bd.paidAt.toDate ? bd.paidAt.toDate().toISOString() : new Date().toISOString())
+                                });
+                            }
+                        });
+
+                        if (firestoreBookings.length > 0) {
+                            const existingCodes = new Set(bookingHistory.map(b => b.code));
+                            firestoreBookings.forEach(fb => {
+                                if (!existingCodes.has(fb.code)) {
+                                    bookingHistory.push(fb);
+                                    existingCodes.add(fb.code);
+                                }
+                            });
+                            bookingHistory.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                            // Save back to localStorage for persistence
+                            try {
+                                localStorage.setItem('anterin_bookings_' + uid, JSON.stringify(bookingHistory));
+                                localStorage.setItem('anterin_all_bookings', JSON.stringify(bookingHistory));
+                            } catch(e) {}
+                            if (typeof renderRiwayat === 'function') renderRiwayat();
+                        }
+                    }
+                } catch(err) {
+                    console.warn('restoreBookingHistoryForUser Firestore error:', err);
                 }
             }
         }
@@ -8118,6 +8287,23 @@
                 currentUser.avatarDataUrl = null;
                 resetAvatarImages();
             }
+
+            // Restore KTP and SIM preview photos
+            const userKtp = currentUser.ktpUrl || (currentUser.uid ? localStorage.getItem('anterin_ktp_' + currentUser.uid) : null);
+            if (userKtp) {
+                currentUser.ktpUrl = userKtp;
+                currentUser.hasKTP = true;
+                const ktpPrev = document.getElementById('profileKTPPreview');
+                if (ktpPrev) { ktpPrev.src = userKtp; ktpPrev.style.display = 'block'; }
+            }
+            const userSim = currentUser.simUrl || (currentUser.uid ? localStorage.getItem('anterin_sim_' + currentUser.uid) : null);
+            if (userSim) {
+                currentUser.simUrl = userSim;
+                currentUser.hasSIM = true;
+                const simPrev = document.getElementById('profileSIMPreview');
+                if (simPrev) { simPrev.src = userSim; simPrev.style.display = 'block'; }
+            }
+            if (typeof updateSIMBadge === 'function') updateSIMBadge();
         }
 
         function handleRentalCardPhotoUpload(input) {
@@ -8430,8 +8616,12 @@
                     if (currentUser) {
                         currentUser.hasKTP = true;
                         currentUser.ktpUrl = dataUrl;
+                        try {
+                            localStorage.setItem('anterin_ktp_' + (currentUser.uid || 'user'), dataUrl);
+                            localStorage.setItem('anterin_user_' + (currentUser.uid || 'user'), JSON.stringify(currentUser));
+                        } catch(e) {}
                         if (firebaseReady && fbDb && currentUser.uid) {
-                            fbDb.collection('users').doc(currentUser.uid).update({ hasKTP: true, ktpUrl: dataUrl }).catch(()=>{});
+                            fbDb.collection('users').doc(currentUser.uid).set({ hasKTP: true, ktpUrl: dataUrl }, { merge: true }).catch(()=>{});
                         }
                     }
                     updateSIMBadge();
@@ -8452,8 +8642,12 @@
                     if (currentUser) {
                         currentUser.hasSIM = true;
                         currentUser.simUrl = dataUrl;
+                        try {
+                            localStorage.setItem('anterin_sim_' + (currentUser.uid || 'user'), dataUrl);
+                            localStorage.setItem('anterin_user_' + (currentUser.uid || 'user'), JSON.stringify(currentUser));
+                        } catch(e) {}
                         if (firebaseReady && fbDb && currentUser.uid) {
-                            fbDb.collection('users').doc(currentUser.uid).update({ hasSIM: true, simUrl: dataUrl }).catch(()=>{});
+                            fbDb.collection('users').doc(currentUser.uid).set({ hasSIM: true, simUrl: dataUrl }, { merge: true }).catch(()=>{});
                         }
                     }
                     updateSIMBadge();
@@ -10233,6 +10427,11 @@
 
             const hasHistory = (bookingHistory && bookingHistory.length > 0);
 
+            // Build set of booking codes that already have reviews (1 booking = 1 review rule)
+            const reviewedCodes = new Set(
+                (testimonialsPool || []).filter(t => t.bookingCode).map(t => t.bookingCode)
+            );
+
             if (sel) {
                 if (hasHistory) {
                     sel.disabled = false;
@@ -10240,8 +10439,27 @@
                         const carId = b.carId || b.listingId || '';
                         const carName = b.carName || 'Unit Rental';
                         const partner = b.partnerName || 'Rental Mas Amba Semarang';
-                        return `<option value="${b.code}" data-car-id="${carId}" data-car-name="${carName}" data-partner-name="${partner}" ${idx === 0 ? 'selected' : ''}>${carName} — ${partner} (Kode: ${b.code})</option>`;
+                        const alreadyReviewed = reviewedCodes.has(b.code);
+                        const label = alreadyReviewed
+                            ? `${carName} — ${partner} (Kode: ${b.code}) ✓ Sudah diulas`
+                            : `${carName} — ${partner} (Kode: ${b.code})`;
+                        return `<option value="${b.code}" data-car-id="${carId}" data-car-name="${carName}" data-partner-name="${partner}" data-reviewed="${alreadyReviewed}" ${idx === 0 ? 'selected' : ''}>${label}</option>`;
                     }).join('');
+
+                    // Check if selected option is already reviewed; show warning if so
+                    const updateReviewState = () => {
+                        const opt = sel.options[sel.selectedIndex];
+                        const isReviewed = opt && opt.getAttribute('data-reviewed') === 'true';
+                        const reviewWarning = document.getElementById('reviewAlreadyDoneNotice');
+                        if (reviewWarning) reviewWarning.style.display = isReviewed ? 'block' : 'none';
+                        if (btn) {
+                            btn.disabled = isReviewed;
+                            btn.style.opacity = isReviewed ? '0.4' : '1';
+                            btn.style.cursor = isReviewed ? 'not-allowed' : 'pointer';
+                        }
+                    };
+                    sel.onchange = updateReviewState;
+                    updateReviewState();
 
                     // If opened from a car detail page, try to match that car in booking history
                     if (filterCarName) {
@@ -10250,6 +10468,7 @@
                             const optCar = (sel.options[i].getAttribute('data-car-name') || '').toLowerCase();
                             if (optCar.includes(cleanFilter) || cleanFilter.includes(optCar)) {
                                 sel.selectedIndex = i;
+                                sel.onchange();
                                 break;
                             }
                         }
@@ -10331,6 +10550,19 @@
                 return;
             }
 
+            const bookingCode = selectedOpt.value;
+
+            // ============================================================
+            // VALIDATION: 1 perjalanan = 1 testimoni (cek duplikat booking code)
+            // ============================================================
+            const alreadyReviewed = testimonialsPool.some(t =>
+                t.bookingCode === bookingCode && t.bookingCode
+            );
+            if (alreadyReviewed) {
+                showToast(`Anda sudah memberikan ulasan untuk perjalanan ini (${bookingCode}). Setiap perjalanan hanya dapat diulas satu kali.`, 'error');
+                return;
+            }
+
             const rawCarName  = selectedOpt.getAttribute('data-car-name') || (currentListing ? currentListing.carName : 'Toyota Innova Reborn');
             const matchedCar  = (typeof allListings !== 'undefined' ? allListings : []).find(l => (l.carName || '').toLowerCase() === (rawCarName || '').toLowerCase())
                 || (typeof DUMMY_LISTINGS !== 'undefined' ? DUMMY_LISTINGS : []).find(l => (l.carName || '').toLowerCase() === (rawCarName || '').toLowerCase());
@@ -10338,7 +10570,6 @@
             const carId       = (matchedCar ? matchedCar.id : optCarId) || (currentListing ? currentListing.id : 'dl-1');
             const carName     = matchedCar ? matchedCar.carName : rawCarName;
             const partnerName = selectedOpt.getAttribute('data-partner-name') || (currentListing ? currentListing.partnerName : (matchedCar ? matchedCar.partnerName : 'Rental Mas Amba Semarang'));
-            const bookingCode = selectedOpt.value;
 
             const newTesti = {
                 id: 'testi-' + Date.now(),

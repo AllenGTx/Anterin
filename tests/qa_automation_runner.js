@@ -285,6 +285,8 @@ window.initWidgetCarOptions = typeof initWidgetCarOptions !== 'undefined' ? init
 window.onWidgetCarSearch = typeof onWidgetCarSearch !== 'undefined' ? onWidgetCarSearch : null;
 window.onWidgetCarSelectChange = typeof onWidgetCarSelectChange !== 'undefined' ? onWidgetCarSelectChange : null;
 window.updateCombinedBookingPickup = typeof updateCombinedBookingPickup !== 'undefined' ? updateCombinedBookingPickup : null;
+window.restoreBookingHistoryForUser = typeof restoreBookingHistoryForUser !== 'undefined' ? restoreBookingHistoryForUser : null;
+window.updateProfileModalUI = typeof updateProfileModalUI !== 'undefined' ? updateProfileModalUI : null;
 window.updateCombinedDetailPickup = typeof updateCombinedDetailPickup !== 'undefined' ? updateCombinedDetailPickup : null;
 window.mergeTestimonialsWithDefaults = typeof mergeTestimonialsWithDefaults !== 'undefined' ? mergeTestimonialsWithDefaults : null;
 window.syncAllListingReviewStats = typeof syncAllListingReviewStats !== 'undefined' ? syncAllListingReviewStats : null;
@@ -588,6 +590,83 @@ assert(healedItem && healedItem.carId === 'dl-7', 'Self-Healing PASS: Corrupted 
 const defaultDummyPreserved = DEFAULT_TESTIMONIALS.every(d => mergedResult.some(m => m.id === d.id));
 assert(defaultDummyPreserved, 'Synchronization PASS: All 10 dummy reviews preserved in merged database pool');
 assert(mergedResult.length >= 11, `Pool length >= 11 with dummy + user reviews (Found: ${mergedResult.length})`);
+
+// -------------------------------------------------------------
+// 1 Booking = 1 Testimonial Enforcement Validation
+// -------------------------------------------------------------
+const poolCountBeforeDuplicate = mockWindow.testimonialsPool.length;
+// Try submitting duplicate review for the exact same BMW booking code
+mockWindow.openTestimonialModal('BMW X7 xDrive');
+mockDocument.getElementById('reviewBookingSelect').value = bmwBooking.code;
+mockDocument.getElementById('reviewText').value = 'Test ulasan kedua yang seharusnya DITOLAK oleh sistem!';
+mockWindow.submitCustomerTestimonial();
+
+assert(mockWindow.testimonialsPool.length === poolCountBeforeDuplicate, '1 Perjalanan = 1 Testi PASS: Duplicate review for same booking was rejected');
+
+// -------------------------------------------------------------
+// User Profile & History Persistence Across Session Reload Test
+// -------------------------------------------------------------
+// Simulate uploading KTP and SIM
+const mockUid = 'user-ok-gas-persist';
+mockWindow.currentUser = {
+    uid: mockUid,
+    first: 'Ok',
+    last: 'Gas',
+    email: 'aputra12214@gmail.com',
+    phone: '081284080866',
+    role: 'renter',
+    hasSIM: true,
+    hasKTP: true,
+    ktpUrl: 'data:image/jpeg;base64,mockKtpDataUrl',
+    simUrl: 'data:image/jpeg;base64,mockSimDataUrl',
+    avatarDataUrl: 'data:image/jpeg;base64,mockAvatarDataUrl'
+};
+mockLocalStorage.setItem('anterin_user_' + mockUid, JSON.stringify(mockWindow.currentUser));
+mockLocalStorage.setItem('anterin_ktp_' + mockUid, mockWindow.currentUser.ktpUrl);
+mockLocalStorage.setItem('anterin_sim_' + mockUid, mockWindow.currentUser.simUrl);
+mockLocalStorage.setItem('anterin_avatar_' + mockUid, mockWindow.currentUser.avatarDataUrl);
+
+// Persist both bookings: BMW X7 and Mobil Roti
+const multiBookings = [
+    {
+        code: 'ANT-BMW-7788',
+        carId: 'dl-7',
+        carName: 'BMW X7 xDrive',
+        partnerName: 'Rental Mas Amba Semarang',
+        total: 2500000,
+        status: 'paid',
+        renterName: 'Ok Gas',
+        renterPhone: '081284080866',
+        createdAt: '2026-10-20T10:00:00.000Z'
+    },
+    {
+        code: 'ANT-ROTI-9900',
+        carId: 'dl-roti',
+        carName: 'Mobil Roti',
+        partnerName: 'Rental Tel Aviv',
+        total: 10000,
+        status: 'paid',
+        renterName: 'Ok Gas',
+        renterPhone: '081284080866',
+        createdAt: '2026-10-20T12:00:00.000Z'
+    }
+];
+mockLocalStorage.setItem('anterin_bookings_' + mockUid, JSON.stringify(multiBookings));
+
+// Simulate session reload: clear memory and run restoreBookingHistoryForUser
+mockWindow.bookingHistory = [];
+mockWindow.restoreBookingHistoryForUser(mockUid);
+
+assert(mockWindow.bookingHistory.length === 2, `Session Restore PASS: Both BMW X7 and Mobil Roti restored (Count: ${mockWindow.bookingHistory.length})`);
+assert(mockWindow.bookingHistory.some(b => b.carName === 'BMW X7 xDrive'), 'Session Restore PASS: BMW X7 booking preserved');
+assert(mockWindow.bookingHistory.some(b => b.carName === 'Mobil Roti'), 'Session Restore PASS: Mobil Roti booking preserved');
+
+// Verify updateProfileModalUI restores KTP and SIM preview
+mockWindow.updateProfileModalUI();
+assert(mockWindow.currentUser.hasKTP === true, 'Profile Persistence PASS: hasKTP is preserved');
+assert(mockWindow.currentUser.hasSIM === true, 'Profile Persistence PASS: hasSIM is preserved');
+assert(mockWindow.currentUser.ktpUrl === 'data:image/jpeg;base64,mockKtpDataUrl', 'Profile Persistence PASS: KTP photo data preserved');
+assert(mockWindow.currentUser.simUrl === 'data:image/jpeg;base64,mockSimDataUrl', 'Profile Persistence PASS: SIM photo data preserved');
 
 // =========================================================================
 // TEST SUITE 6: MITRA REGISTRATION WITH RENTAL LOCATION
