@@ -1896,9 +1896,8 @@
         <span id="why-choose-us-anchor" style="position:relative; top:-80px; display:block; visibility:hidden;"></span>
         <section class="why-choose-us-video">
             <video autoplay muted loop playsinline class="why-choose-video" preload="auto">
-                <source src="asset/videobackgroundcar.webm?v=2" type="video/webm">
-                <source src="asset/Background.mp4?v=2" type="video/mp4">
-                <source src="Background.mp4?v=2" type="video/mp4">
+                <source src="asset/videobackgroundcar.webm" type="video/webm">
+                <source src="asset/Background.mp4" type="video/mp4">
                 Browser Anda tidak mendukung video HTML5.
             </video>
             <div class="why-choose-overlay"></div>
@@ -2910,16 +2909,6 @@
                             </div>
                         </div>
 
-                        <div class="auth-input-group">
-                            <label><i class="fa-solid fa-camera" style="color:var(--gold);"></i> Selfie dengan KTP (Wajib)</label>
-                            <div class="ktp-upload-area" id="selfieArea">
-                                <input type="file" accept="image/*" capture="user" onchange="previewDoc(this, 'selfiePreview', 'selfieArea')">
-                                <div class="ktp-upload-icon"><i class="fa-solid fa-camera"></i></div>
-                                <p><strong>Foto selfie memegang KTP</strong><br>Wajah dan KTP harus terlihat jelas</p>
-                                <img id="selfiePreview" class="ktp-preview">
-                            </div>
-                        </div>
-
                         <div class="disclaimer-box">
                             <strong>⚠️ Disclaimer & Syarat Verifikasi Identitas</strong>
                             <ul>
@@ -3186,9 +3175,8 @@
         <!-- HERO BANNER DENGAN VIDEO BACKGROUND (MEGA LUXURY BANNER) -->
         <div style="position:relative; min-height:85vh; padding:160px 40px 140px; text-align:center; color:white; overflow:hidden; display:flex; align-items:center; justify-content:center;">
             <video autoplay muted loop playsinline class="why-choose-video" id="mitraHeroBg" preload="auto">
-                <source src="asset/videobackgroundcar.webm?v=2" type="video/webm">
-                <source src="asset/Background.mp4?v=2" type="video/mp4">
-                <source src="Background.mp4?v=2" type="video/mp4">
+                <source src="asset/videobackgroundcar.webm" type="video/webm">
+                <source src="asset/Background.mp4" type="video/mp4">
                 Browser Anda tidak mendukung video HTML5.
             </video>
             <div style="position:absolute; inset:0; background:linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.88)); z-index:2;"></div>
@@ -3255,7 +3243,7 @@
                                 <i class="fa-solid fa-shield-halved"></i>
                             </div>
                             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:6px 12px; display:flex; align-items:center; gap:8px;">
-                                <img src="asset/allianz.svg.webp" alt="Allianz Official Insurance Partner" style="height:26px; max-width:110px; object-fit:contain;" onerror="this.style.display='none';">
+                                <img src="asset/Allianz.svg.webp" alt="Allianz Official Insurance Partner" style="height:26px; max-width:110px; object-fit:contain;" onerror="this.onerror=null; this.src='asset/allianz.svg.webp';">
                                 <span style="font-size:11px; font-weight:800; color:#003781; letter-spacing:0.3px; text-transform:uppercase;">Official Partner</span>
                             </div>
                         </div>
@@ -3267,8 +3255,8 @@
                         <div style="width:48px; height:48px; border-radius:12px; background:rgba(234,179,8,0.12); display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:20px; margin-bottom:18px;">
                             <i class="fa-solid fa-user-shield"></i>
                         </div>
-                        <h3 style="font-family:'Urbanist',sans-serif; font-size:18px; font-weight:800; color:var(--navy); margin-bottom:8px;">Verifikasi Penyewa Ketat 3-Lapis</h3>
-                        <p style="color:#64748b; font-size:14px; line-height:1.6; margin:0;">Penyewa wajib lolos verifikasi KTP fisik, SIM A aktif, dan biometrik selfie sebelum dapat memesan armada untuk mencegah penggelapan unit.</p>
+                        <h3 style="font-family:'Urbanist',sans-serif; font-size:18px; font-weight:800; color:var(--navy); margin-bottom:8px;">Verifikasi Penyewa Ketat 2-Langkah</h3>
+                        <p style="color:#64748b; font-size:14px; line-height:1.6; margin:0;">Penyewa wajib lolos verifikasi KTP fisik dan SIM A aktif sebelum dapat memesan armada untuk mencegah penggelapan unit.</p>
                     </div>
 
                     <div style="background:white; border-radius:18px; border:1px solid #e2e8f0; padding:32px; box-shadow:0 6px 20px rgba(0,0,0,0.04);">
@@ -4262,6 +4250,10 @@
                 if (notice) notice.style.display = 'none';
             }
             showOnly(jadiMitraPage);
+            const mitraVid = document.getElementById('mitraHeroBg');
+            if (mitraVid && mitraVid.paused) {
+                mitraVid.play().catch(() => {});
+            }
         }
 
         function togglePasswordVisibility(inputId, btn) {
