@@ -56,6 +56,8 @@ const requiredAssets = [
     'asset/allianz.svg.webp',
     'asset/default-rental-office.jpg',
     'asset/Sopir1.jpg',
+    'asset/favicon.svg',
+    'favicon.svg',
     'asset/qris-nasional.jpg',
     'qris-nasional.jpg'
 ];
@@ -65,6 +67,8 @@ requiredAssets.forEach(assetPath => {
 });
 
 // Check removal of deprecated terms requested by user
+assert(rawHtml.includes('rel="icon"'), 'Favicon: <link rel="icon"> present in HTML <head>');
+assert(rawHtml.includes('asset/favicon.svg') || rawHtml.includes('image/svg+xml'), 'Favicon: SVG car icon configured for browser tab');
 assert(!rawHtml.includes('Buka 24 Jam'), 'Clean UI: Text "Buka 24 Jam" successfully removed');
 assert(!rawHtml.includes('Akses Cepat'), 'Clean UI: Section/Pill "Akses Cepat" successfully removed');
 
